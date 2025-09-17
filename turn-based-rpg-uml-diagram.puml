@@ -1,0 +1,199 @@
+@startuml
+title Turn Based RPG (2 playable characters + 1 npc enemy) - UML Class Diagram
+
+' @Interfaces
+interface TurnAction {
+    +startTurn(): void
+    +endTurn(): void
+    +canAct(): boolean
+}
+interface Usable {
+    +use(user: PlayableCharacter, target: Enemy): void
+    +isUsable(user: PlayableCharacter): boolean
+    +cooldownRemaining(): int
+}
+
+' @Exceptions
+class MaxInstancesLimitException extends RuntimeException
+class InventoryFullException extends RuntimeException
+class InvalidActionExecution extends RuntimeException
+class AbilityOnCooldownException extends RuntimeException
+
+' @ InstanceLimitHelper
+class InstanceLimitHelper {
+    {static} -MAX_PER_CLASS: int = 100
+    {static} -counts: Map<Class, Integer>
+    {static} +registerOrThrow(c: Class): void throws MaxInstancesLimitException
+    {static} +decrement(c: Class): void
+}
+
+' @PlayableCharacters
+abstract class PlayableCharacter implements TurnAction {
+    - uniqueId: int
+    - name: String
+    - characterClass: String
+    - description: String
+    - level: int
+    - hp: int
+    - actionPoints: int
+    - strength: int
+    - intelligence: int
+    - agility: int
+    - inventory: Inventory
+
+    ' Methods
+    +attack(target: Enemy): void
+    +takeDamage(amount: int): void
+    +useAbility(ability: Ability, target: Enemy): void throws AbilityOnCooldownException
+    +useItem(item: Usable, target: Enemy): void throws InvalidActionExecution
+    +startTurn(): void
+    +endTurn(): void
+    +canAct(): boolean
+    +toString(): String
+}
+class Warrior extends PlayableCharacter {
+    +attack(target: Enemy): void @Override
+    +startTurn(): void @Override
+    +useAbility(ability: Ability, target: Enemy): void @Override
+    +toString(): String @Override
+}
+class Mage extends PlayableCharacter {
+    +attack(target: Enemy): void @Override
+    +startTurn(): void @Override
+    +useAbility(ability: Ability, target: Enemy): void @Override
+    +toString(): String @Override
+}
+
+' @NonPlayableCharacters (Enemy)
+class Enemy implements TurnAction {
+    - uniqueId: int
+    - name: String
+    - description: String
+    - level: int
+    - hp: int
+    - actionPoints: int
+
+    +chooseAction(targets: List<PlayableCharacter>): void
+    +attack(target: PlayableCharacter): void
+    +takeDamage(amount: int): void
+    +startTurn(): void
+    +endTurn(): void
+    +canAct(): boolean
+    +toString(): String
+}
+
+' @Inventory
+class Inventory {
+    -ownerId: int
+    -capacity: int
+    -items: List<Item>
+    -goldAmount: int
+
+    +addItem(item: Item): void throws InventoryFullExeception
+    +removeItem(itemId: int): void
+    +hasSpaceFor(item: Item): boolean
+    +findById(itemId: int): Item
+    +totalWeight(): double
+    +transferTo(target: Inventory, itemId: int): void
+}
+abstract class Item {
+    -itemId: int
+    -name: String
+    -weight: double
+    -rarity: String
+    +toString(): String
+}
+class Weapon extends Item implements Usable {
+    -minDamage: int
+    -maxDamage: int
+    -critChance: double
+    -durability: int
+    -cooldown: int
+    -lastUsedTurn: int
+    -actionPointCost: int
+
+    +use(player: PlayableCharacter, target: Enemy): void
+    +isUsable(player: PlayableCharacter): boolean
+    +cooldownRemaining(): int
+    +calculateDamage(player: PlayableCharacter): int
+    +rollCrit(): boolean
+    +consumeDurability(): void
+    +rechargeCooldown(): void
+}
+class Gear extends Item implements Usable {
+    -modifiers: Map<String, Integer>
+    -equippable: boolean
+    -consumesOnUse: boolean
+    -charges: int
+    -cooldown: int
+    -lastUsedTurn: int
+    -actionPointCost: int
+
+    +use(player: PlayableCharacter, target: Enemy): void
+    +isUsable(player: PlayableCharacter): boolean
+    +cooldownRemaining(): int
+    +applyTemporaryModifiers(player: PlayableCharacter): void
+    +consumeCharge(): void
+    +recharge(): void
+    +expiresAfterBattle(): boolean
+}
+
+
+' @Abilities
+class Ability implements Usable {
+    -abilityId: int
+    -name: String
+    -actionPointCost: int
+    -cooldown: int
+    -lastUsedTurn: int
+    -power: int
+    -scalingStat: String
+
+    +use(player: PlayableCharacter, target: Enemy): void throws AbilityOnCooldownException
+    +isUsable(player: PlayableCharacter): boolean
+    +cooldownRemaining(): int
+    +spendActionPoints(player: PlayableCharacter): int
+    +putOnCooldown(): void
+    +scalingValue(player: PlayableCharacter): int
+}
+
+' @BattleFieldManager
+class BattlefieldManager {
+    -turnOrder: Queue<TurnAction>
+    -turnCount: int
+
+    +initCombat(players: List<PlayableCharacter>, enemy: Enemy): void
+    +nextTurn(): TurnAction
+    +isBattleOver(): boolean
+    +winner(): String
+}
+
+
+
+' @Relationships
+PlayableCharacter "1 PlayableCharacter" o-- "Many Abilities" Ability
+Inventory "1 Inventory" o-- "Many Items" Item
+PlayableCharacter "1 PlayableCharacter" *-- "1 Inventory" Inventory
+
+BattlefieldManager "1 BattlefieldManager" o-- "2 PlayableCharacters" PlayableCharacter
+BattlefieldManager "1 BattlefieldManager" o-- "1 Enemy" Enemy
+
+
+note bottom of Inventory
+transferTo() lets Warrior & Mage share items.
+end note
+
+note bottom of Weapon
+All actions via use(); durability and cooldown enforce limits.
+end note
+
+note bottom of Gear
+Set consumesOnUse=true and charges≥1 for a consumable.
+Modifiers can be applied temporarily on use.
+end note
+
+note top of InstanceLimitHelper
+Call registerOrThrow in constructors to enforce cap of 100 instances per class.
+end note
+
+@enduml
