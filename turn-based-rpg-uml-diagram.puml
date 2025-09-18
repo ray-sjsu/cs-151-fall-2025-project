@@ -20,7 +20,7 @@ enum RarityType {
 }
 enum StatusType {
     IDLE
-    ATTACKING
+    READY
     DEAD
     MISSING
 }
@@ -55,7 +55,6 @@ abstract class Characters {
     +takeDamage(amount: int): void
     +useAbility(ability: Ability, target: Characters): void throws AbilityOnCooldownException
     +startTurn(): void
-    +ability
     +canAct(): boolean
     +toString(): String
 
@@ -66,7 +65,7 @@ class PlayableCharacter extends Characters {
     +heal(amount: int): void
     +levelUp(): void
     +equipWeapon(weapon: Weapon): void
-    +loot(inventory: Inventory): void
+    +loot(items: List<Item>): void
 }
 class Enemy extends Characters {
     +fleeChance(): boolean
@@ -77,7 +76,7 @@ class Enemy extends Characters {
 
 ' @Inventory, Items, Weapons, and Abilities
 class Inventory {
-    -capacity: int
+    -slotCapacity: int
     -items: List<Item>
 
     +addItem(item: Item): void throws InventoryFullException
@@ -120,9 +119,9 @@ class Ability implements Usable {
     -actionPointCost: int
     -cooldown: int
 
-    +spendActionPoints(player: Characters): int
+    +spendActionPoints(user: Characters): int
     +putOnCooldown(): void
-    +scalingValue(player: Characters): int
+    +scalingValue(user: Characters): int
     +resetCooldown(): void
 }
 
@@ -132,9 +131,11 @@ class BattlefieldManager {
     -turnOrder: Queue<TurnAction>
 
     +initCombat(player: PlayableCharacter, enemy: Enemy): void
+    +currentActor(): Characters
     +nextTurn(): TurnAction
     +isBattleOver(): boolean
     +currentTurn(): int
+    +winner(): String
     +toString(): String
 }
 class TurnAction {
@@ -149,9 +150,9 @@ class TurnAction {
 Characters "<color:red>1</color>" *-- "<color:red>1       </color>" Inventory
 Characters "<color:red>1      </color>" o-- "<color:red>*</color>" Ability
 
-Inventory "<color:red>  1</color>" o-- "<color:red>          0..1</color>" Item
+Inventory "<color:red>  1</color>" o-- "<color:red>          0..*</color>" Item
 
-BattlefieldManager "<color:red>1  </color>" o-- "<color:red>*</color>" Characters
+BattlefieldManager "<color:red>1  </color>" o-- "<color:red>2 </color>" Characters
 BattlefieldManager ..> TurnAction
 
 
