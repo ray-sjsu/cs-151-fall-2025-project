@@ -19,7 +19,14 @@ public abstract class Characters {
     private Map<StatType, Integer> stats;
     private StatusType status;
 
-    // Methods
+    // Constructor?
+
+    // Getters/Setters
+
+    public abstract int getStat(StatType type);
+    public abstract int setStat(StatType type, int value);
+
+    // Methods required of subclasses
 
     public abstract void attack(Characters target);
     public abstract void takeDamage(int amt);
@@ -27,9 +34,9 @@ public abstract class Characters {
     public abstract void startTurn();
     public abstract boolean canAct();
 
+    // Override(s)
+
     @Override
     public abstract String toString();
 
-    public abstract int getStat(StatType type);
-    public abstract int setStat(StatType type, int value);
 }
