@@ -10,6 +10,18 @@ public class Inventory {
         this.items = new ArrayList<>();
     }
 
+    public int getSlotCapacity() {
+        return slotCapacity;
+    }
+
+    public List<Items> getItems() {
+        return items;
+    }
+
+    public void setSlotCapacity(int slotCapacity) {
+        this.slotCapacity = slotCapacity;
+    }
+
     public void addItem(Item item) throws InventoryFullException {
 
     }
