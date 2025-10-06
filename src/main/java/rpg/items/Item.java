@@ -59,6 +59,8 @@ public abstract class Item {
 
     @Override
     public String toString() {
-
+        return String.format(
+                "Item \n Name: %s \n ID: %d \n Description: %s \n Weight: %.1f \n Rarity: %s \n Slots Taken: %d"
+                , name, itemId, description, weight, rarity, slotsTaken);
     }
 }
