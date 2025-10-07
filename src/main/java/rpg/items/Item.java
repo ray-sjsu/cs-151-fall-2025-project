@@ -9,6 +9,15 @@ public abstract class Item {
     private RarityType rarity;
     private int slotsTaken;
 
+    public Item(int itemId, String name, String description, double weight, RarityType rarity, int slotsTaken) {
+        this.itemId = itemId;
+        this.name = name;
+        this.description = description;
+        this.weight = weight;
+        this.rarity = rarity;
+        this.slotsTaken = slotsTaken;
+    }
+
     public String getDescription() {
         return description;
     }
