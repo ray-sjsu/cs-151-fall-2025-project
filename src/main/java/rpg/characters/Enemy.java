@@ -7,8 +7,16 @@ import rpg.abilities.Ability;
 
 public class Enemy extends Characters {
 
-    // Methods
+    // Constructors
+    public Enemy() {
+        super();        // Calls Character()
+    }
 
+    public Enemy(String name) {
+        super(name);    // Calls Character(name)
+    }
+
+    // Methods
     public boolean fleeChance() {}
 
     public void respawn() {}
@@ -18,7 +26,6 @@ public class Enemy extends Characters {
     public void applyStatusEffect(Characters target) {}
 
     // Overrides due to Characters
-
     @Override
     public void attack(Characters target) {}
 
