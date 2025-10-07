@@ -1,5 +1,9 @@
 package rpg.items;
 
+import java.util.List;
+import java.util.ArrayList;
+import rpg.exceptions.InventoryFullException;
+
 public class Inventory {
 
     private int slotCapacity;
@@ -66,7 +70,7 @@ public class Inventory {
 
     @Override
     public String toString() {
-        String header = String.format("Inventory \n Slot Capacity: %d", slotCapacity);
+        String header = String.format("--- Inventory --- \n Slot Capacity: %d", this.slotCapacity);
         StringBuilder itemList = new StringBuilder();
         itemList.append("Items:\n");
 
