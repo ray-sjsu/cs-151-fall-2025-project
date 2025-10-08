@@ -7,8 +7,16 @@ import rpg.abilities.Ability;
 
 public class PlayableCharacter extends Characters {
 
-    // Methods
+    // Constructors
+    public PlayableCharacter() {
+        super();        // Calls Character()
+    }
 
+    public PlayableCharacter(name) {
+        super(name);    // Calls Character(name)
+    }
+
+    // Methods
     public void heal(int amount) {}
 
     public void levelUp() {}

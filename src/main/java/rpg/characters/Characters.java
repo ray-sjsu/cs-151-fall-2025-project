@@ -19,15 +19,20 @@ public abstract class Characters {
     private Map<StatType, Integer> stats;
     private StatusType status;
 
-    // Constructor?
+    // Constructors
+    public Characters() {
+        this.name = "NO_NAME";
+    }
+
+    public Characters(String name) {
+        this.name = name;
+    }
 
     // Getters/Setters
-
     public abstract int getStat(StatType type);
     public abstract int setStat(StatType type, int value);
 
     // Methods required of subclasses
-
     public abstract void attack(Characters target);
     public abstract void takeDamage(int amt);
     public abstract void useAbility(Ability ability, Characters target) throws AbilityOnCooldownException;
@@ -35,7 +40,6 @@ public abstract class Characters {
     public abstract boolean canAct();
 
     // Override(s)
-
     @Override
     public abstract String toString();
 

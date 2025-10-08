@@ -13,8 +13,9 @@ public class Ability /*implements Usable*/ {
     private int actionPointCost;
     private int cooldown;
 
-    // Methods
+    // Constructors?
 
+    // Methods
     public int spendActionPoints(Characters user) {}
 
     public void putOnCooldown() {}
