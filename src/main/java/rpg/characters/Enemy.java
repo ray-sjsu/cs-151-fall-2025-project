@@ -7,23 +7,30 @@ import rpg.abilities.Ability;
 
 public class Enemy extends Characters {
 
-    // Constructors
-    public Enemy() {
-        super();        // Calls Character()
-    }
-
-    public Enemy(String name) {
-        super(name);    // Calls Character(name)
+    // Constructor
+    public Enemy(String name, int characterId, String description, int level, int healthPoints,
+                             int actionPoints, Inventory inventory, List<Ability> abilities,
+                             Map<StatType, Integer> stats, statusType status) {
+        super(name, characterId, description, level, healthPoints, actionPoints, inventory, abilities,
+                stats, status);
     }
 
     // Methods
-    public boolean fleeChance() {}
+    public boolean fleeChance() {
+        // TODO
+    }
 
-    public void respawn() {}
+    public void respawn() {
+        // TODO
+    }
 
-    public List<Item> dropLoot() {}
+    public List<Item> dropLoot() {
+        // TODO
+    }
 
-    public void applyStatusEffect(Characters target) {}
+    public void applyStatusEffect(Characters target) {
+        // TODO
+    }
 
     // Overrides due to Characters
     @Override
@@ -36,9 +43,28 @@ public class Enemy extends Characters {
     public void useAbility(Ability ability, Characters target) {}
 
     @Override
-    public void startTurn() {}
+    public void startTurn() {
+        // TODO
+    }
 
     @Override
-    public boolean canAct() {}
+    public boolean canAct() {
+        // TODO
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public int getStat(StatType type) {
+        super.getStat(type);
+    }
+
+    @Override
+    public void setStat(StatType type, int value) {
+        super.setStat(type, value);
+    }
 
 }
