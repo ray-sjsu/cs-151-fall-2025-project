@@ -7,12 +7,15 @@ import rpg.abilities.Ability;
 
 public class PlayableCharacter extends Characters {
 
+    private Weapon equippedWeapon;
+
     // Constructor
     public PlayableCharacter(String name, int characterId, String description, int level, int healthPoints,
                              int actionPoints, Inventory inventory, List<Ability> abilities,
                              Map<StatType, Integer> stats, statusType status) {
         super(name, characterId, description, level, healthPoints, actionPoints, inventory, abilities,
                 stats, status);
+        this.equippedWeapon = null;
     }
 
     // Methods
@@ -27,11 +30,15 @@ public class PlayableCharacter extends Characters {
     }
 
     public public void equipWeapon(Weapon weapon) {
-        // TODO:
+        this.equippedWeapon = weapon;
+        System.out.println(getName() + " has equipped " + weapon.getName() + "!");
     }
 
     public void loot(List<Item> items) {
-        // TODO
+        for (Item item : items) {
+            inventory.addItem(item);
+            System.out.println("Added " + item.getName() + " to " + getName() + "'s inventory.");
+        }
     }
 
     // Overrides due to Characters
@@ -41,11 +48,11 @@ public class PlayableCharacter extends Characters {
         int d20 = random.nextInt(20) + 1;
         if (d20 == 20) {
             // CRIT: target.getHealth() -= equipped weapon's damage x 2
-            System.out.println("CRITICAL HIT! " + target.getName() + " took " +  + " damage!");
+            System.out.println("CRITICAL HIT! " getName() + " dealt " +  + " damage to " + target.getName() + "!");
         } else if (d20 >= 10) {
             // NORM: target.getHealth -= equipped weapon's damage
-            System.out.println(target.getName() + " took " +  + " damage.");
-        } else System.out.println(super.getName() + " missed their attack!");
+            System.out.println(getName() + " dealt " +  + " damage to " + target.getName() + ".");
+        } else System.out.println(getName() + " missed their attack!");
     }
 
     @Override
@@ -56,7 +63,7 @@ public class PlayableCharacter extends Characters {
 
     @Override
     public void useAbility(Ability ability, Characters target) {
-        // TODO: differ between damaging and healing abilities
+        // TODO
     }
 
     @Override

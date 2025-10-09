@@ -38,7 +38,7 @@ public class Enemy extends Characters {
     // Overrides due to Characters
     @Override
     public void attack(Characters target) {
-        target.getHealthPoints() -= 5;          // Mobs do 5 damage (for now)
+        target.getHealthPoints() -= 5; // Mobs do 5 damage (for now)
     }
 
     @Override

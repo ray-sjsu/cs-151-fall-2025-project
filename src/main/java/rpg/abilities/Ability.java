@@ -35,7 +35,7 @@ public class Ability implements Usable {
     }
 
     public int scalingValue(Characters user) {
-        // TODO: how is this used?
+        // TODO: take the user's stat and have it affect base power, return actual damage dealt
     }
 
     public void resetCooldown() {
