@@ -27,7 +27,7 @@ public class PlayableCharacter extends Characters {
     }
 
     public public void equipWeapon(Weapon weapon) {
-        // TODO
+        // TODO:
     }
 
     public void loot(List<Item> items) {
@@ -37,7 +37,15 @@ public class PlayableCharacter extends Characters {
     // Overrides due to Characters
     @Override
     public void attack(Characters target) {
-        // TODO
+        // INCORPORATE STR AND DEX HERE
+        int d20 = random.nextInt(20) + 1;
+        if (d20 == 20) {
+            // CRIT: target.getHealth() -= equipped weapon's damage x 2
+            System.out.println("CRITICAL HIT! " + target.getName() + " took " +  + " damage!");
+        } else if (d20 >= 10) {
+            // NORM: target.getHealth -= equipped weapon's damage
+            System.out.println(target.getName() + " took " +  + " damage.");
+        } else System.out.println(super.getName() + " missed their attack!");
     }
 
     @Override
@@ -48,17 +56,17 @@ public class PlayableCharacter extends Characters {
 
     @Override
     public void useAbility(Ability ability, Characters target) {
-        // TODO
+        // TODO: differ between damaging and healing abilities
     }
 
     @Override
     public void startTurn() {
-        // TODO
+        // TODO: not sure what this is
     }
 
     @Override
     public boolean canAct() {
-        // TODO
+        super.canAct();
     }
 
     @Override

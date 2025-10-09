@@ -121,10 +121,27 @@ public abstract class Characters {
     public abstract void takeDamage(int amt);
     public abstract void useAbility(Ability ability, Characters target) throws AbilityOnCooldownException;
     public abstract void startTurn();
-    public abstract boolean canAct();
+
+    public abstract boolean canAct() {
+        if (getStatus() != StatusType.READY) return false;
+        else return true;
+    }
 
     public abstract String toString() {
-        // TODO
+        return String.format(
+                "\n --- Character Info --- " +
+                "\n ID: %d" +
+                "\n Description: %s" +
+                "\n Level: %d" +
+                "\n HP: %d" +
+                "\n AP: %d" +
+                "\n Inventory: %s" +
+                "\n Abilities: %s" +
+                "\n Stats: %s" +
+                "\n Status: %s",
+                name, characterId, description, level, healthPoints, actionPoints, inventory.getItems(),
+                abilities, stats, status
+        );
     }
 
     public abstract int getStat(StatType type) {

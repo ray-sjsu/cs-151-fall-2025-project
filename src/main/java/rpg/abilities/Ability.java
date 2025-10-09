@@ -27,19 +27,19 @@ public class Ability implements Usable {
 
     // Methods
     public int spendActionPoints(Characters user) {
-        // TODO
+        user.getActionPoints() -= this.actionPointCost;
     }
 
     public void putOnCooldown() {
-        // TODO
+        // TODO: how are we tracking time?
     }
 
     public int scalingValue(Characters user) {
-        // TODO
+        // TODO: how is this used?
     }
 
     public void resetCooldown() {
-        // TODO
+        // TODO: how are we tracking time?
     }
 
     // Overrides due to Usable
@@ -47,18 +47,34 @@ public class Ability implements Usable {
     public void use(Characters user, Characters target) {
         if (!isUsable(user, target)) return;
 
-        // TODO
+        if (user.getStatus() != StatusType.READY) return;
+
+        // check that the ability is not on cd
+
+        //TODO: incorporate INT
 
     }
 
     @Override
     public boolean isUsable(Characters user, Characters target) {
-        // TODO
+        if (user.getHealthPoints() <= 0) {
+            System.out.println(user.getName() + " is not alive");
+            return false;
+        }
+        if (target.getHealthPoints() <= 0) {
+            System.out.println(target.getName() + " is not alive");
+            return false;
+        }
+        if (user.getActionPoints() <= 0) {
+            System.out.println(user.getName() + " does not have enough AP");
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int cooldownRemaining() {
-        // TODO: refer to battlefield package
+        // TODO: how are we tracking time?
     }
 
     @Override
@@ -69,11 +85,12 @@ public class Ability implements Usable {
                 "\n ID: %d" +
                 "\n Last Used: %d" +
                 "\n Power: %d" +
-                "\n Scaling Stat: %s" +     // Possible error?
-                "\n AP Cost: %d", +
-                "\n Cooldown: %d"
+                "\n Scaling Stat: %s" +
+                "\n AP Cost: %d" +
+                "\n Cooldown: %d",
                 this.name, this.abilityId, this.lastUsedTurn, this.power, this.scalingStat, this.actionPointCost,
-                this.cooldown);
+                this.cooldown
+        );
     }
 
 }
