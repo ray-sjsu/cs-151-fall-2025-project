@@ -1,29 +1,72 @@
 package rpg.abilities;
 
-// IMPORT USABLE HERE ONCE IMPLEMENTED
+import rpg.battlefield.BattlefieldManager;
 import rpg.core.StatType;
 import rpg.characters.Characters;
 
-public class Ability /*implements Usable*/ {
-    private int abilityId;
+public class Ability {
     private String name;
-    private int lastUsedTurn;
-    private int power;
-    private StatType scalingStat;
+    private String description;
     private int actionPointCost;
-    private int cooldown;
+    private int baseCooldown;
+    private int cooldownRemaining;
 
-    // Constructors?
+    // Constructor
+    public Ability (String name, String description, int actionPointCost, int baseCooldown) {
+        this.name = name;
+        this.description = description;
+        this.actionPointCost = actionPointCost;
+        this.baseCooldown = baseCooldown;
+        this.cooldownRemaining = 0;
+    }
 
-    // Methods
-    public int spendActionPoints(Characters user) {}
+    // Core Methods
+    public void use(Characters user, List<Characters> target, BattlefieldManager bf) {
+        if (!isReady()) {
+            System.out.println(name + " is still on cooldown!");
+        }
+        if (user.getCurrentActionPoints() < actionPointCost) {
+            System.out.println(user.getName() + " does not have enough AP!");
+            return;
+        }
+        System.out.println(user.getName() + " uses " + name + " on " + target.size() + " target(s).");
 
-    public void putOnCooldown() {}
+        user.setCurrentActionPoints(user.getCurrentActionPoints() - actionPointCost);
+        putOnCooldown();
+    }
 
-    public int scalingValue(Characters user) {}
+    // CD Management
+    public boolean isReady() {
+        if (cooldownRemaining == 0) return true;
+        else return false;
+    }
 
-    public void resetCooldown() {}
+    public void putOnCooldown() {
+        cooldownRemaining = baseCooldown;
+    }
 
-    // Overrides due to Usable
+    public void resetCooldown() {
+        cooldownRemaining = 0;
+    }
+
+    public void tickCooldown() {
+        if (cooldownRemaining > 0) cooldownRemaining--;
+        else System.out.println(getName() + " is ready to use.");
+    }
+
+    // There's already a variable for this.
+//    public int getCooldownRemaining() {}
+
+    // Debug Info
+    @Override
+    public string toString() {
+        return String.format(
+                "\n--- Ability Details ---" +
+                "\nName: %s | AP Cost: %d | Cooldown: %d" +
+                "\nDescription: %s" +
+                "\nCooldown Remaining: %d",
+                this.name, this.actionPointCost, this.baseCooldown, this.description, this.cooldownRemaining
+        );
+    }
 
 }
