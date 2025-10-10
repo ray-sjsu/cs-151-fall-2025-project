@@ -44,22 +44,26 @@ abstract class Characters {
     - name: String
     - description: String
     - level: int
-    - hp: int
-    - actionPoints: int
+    - maxHealth: int
+    - currentHealth: int
+    - maxActionPoints: int
+    - currentActionPoints: int
     - inventory: Inventory
     - abilities: List<Ability>
-    - stats: Map<StatType, int>
+    - stats: Map<StatType, Integer>
     - status: StatusType
 
-    +attack(target: Characters): void
-    +takeDamage(amount: int): void
-    +useAbility(ability: Ability, target: Characters): void throws AbilityOnCooldownException
-    +startTurn(): void
-    +canAct(): boolean
-    +toString(): String
+    + attack(target: Characters): void
+    + takeDamage(amount: int): void
+    + useAbility(ability: Ability, target: Characters): void throws AbilityOnCooldownException
+    + startTurn(): void
+    + canAct(): boolean
+    + toString(): String
 
-    +getStat(type: StatType): int
-    +setStat(type: StatType, value: int): void
+    + getStat(type: StatType): int
+    + setStat(type: StatType, value: int): int
+    + isAlive(): boolean
+    + restoreActionPoints(): void
 }
 class PlayableCharacter extends Characters {
     +heal(amount: int): void
@@ -71,7 +75,7 @@ class Enemy extends Characters {
     +fleeChance(): boolean
     +respawn(): void
     +dropLoot(): List<Item>
-    +applyStatusEffect(target: Characters): void
+    ' Removed for now: +applyStatusEffect(target: Characters): void
 }
 
 ' @Inventory, Items, Weapons, and Abilities
@@ -119,6 +123,8 @@ class Ability implements Usable {
     -actionPointCost: int
     -cooldown: int
 
+    +isReady(): boolean
+    +use(user: Characters, targets: List<Characters>, bf: BattlefieldManager): void
     +spendActionPoints(user: Characters): int
     +putOnCooldown(): void
     +scalingValue(user: Characters): int
