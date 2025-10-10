@@ -10,18 +10,18 @@ public class PlayableCharacter extends Characters {
     private Weapon equippedWeapon;
 
     // Constructor
-    public PlayableCharacter(String name, int characterId, String description, int level, int healthPoints,
-                             int actionPoints, Inventory inventory, List<Ability> abilities,
-                             Map<StatType, Integer> stats, statusType status) {
-        super(name, characterId, description, level, healthPoints, actionPoints, inventory, abilities,
-                stats, status);
+    public PlayableCharacter(String name, int characterId, String description, int level, int maxHealth,
+                             int currentHealth, int maxActionPoints, int currentActionPoints, Inventory inventory,
+                             List<Ability> abilities, Map<StatType, Integer> stats, statusType status) {
+        super(name, characterId, description, level, maxHealth, currentHealth, maxActionPoints, currentActionPoints,
+                inventory, abilities, stats, status);
         this.equippedWeapon = null;
     }
 
     // Methods
     public void heal(int amount) {
-        int newHp = getHealthPoints() + amount;
-        setHealthPoints(newHp);
+        int newHp = getMaxHealth() + amount;
+        setMaxHealth(newHp);
     }
 
     public void levelUp() {
@@ -44,31 +44,30 @@ public class PlayableCharacter extends Characters {
     // Overrides due to Characters
     @Override
     public void attack(Characters target) {
-        // INCORPORATE STR AND DEX HERE
-        int d20 = random.nextInt(20) + 1;
-        if (d20 == 20) {
-            // CRIT: target.getHealth() -= equipped weapon's damage x 2
-            System.out.println("CRITICAL HIT! " getName() + " dealt " +  + " damage to " + target.getName() + "!");
-        } else if (d20 >= 10) {
-            // NORM: target.getHealth -= equipped weapon's damage
-            System.out.println(getName() + " dealt " +  + " damage to " + target.getName() + ".");
-        } else System.out.println(getName() + " missed their attack!");
+        if (equippedWeapon != null) {
+            int dmgDealt = equippedWeapon.calculateDamage(this, target);
+            target.getHealth() -= dmgDealt;
+            System.out.println(this.getName() + " dealt " + dmgDealt + " to " + target.getName() + ".");
+        } else System.out.println("No damage dealt. Equip a weapon!");
+
     }
 
     @Override
     public void takeDamage(int amount) {
-        int newHp = getHealthPoints() - amount;
-        setHealthPoints(newHp);
+        int newHp = getMaxHealth() - amount;
+        setMaxHealth(newHp);
     }
 
     @Override
-    public void useAbility(Ability ability, Characters target) {
-        // TODO
+    public void useAbility(Ability ability, Characters target) throws AbilityOnCooldownException {
+        super.useAbility(ability, target);
     }
 
     @Override
     public void startTurn() {
-        // TODO: not sure what this is
+        for (Ability a : abilities) a.tickCooldown();
+        restoreActionPoints();
+        System.out.println(name + "'s turn begins!");
     }
 
     @Override

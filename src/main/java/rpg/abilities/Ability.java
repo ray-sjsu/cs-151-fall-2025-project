@@ -1,95 +1,71 @@
 package rpg.abilities;
 
-import rpg.core.Usable;
+import rpg.battlefield.BattlefieldManager;
 import rpg.core.StatType;
 import rpg.characters.Characters;
 
-public class Ability implements Usable {
+public class Ability {
     private String name;
-    private int abilityId;
-    private int lastUsedTurn;
-    private int power;
-    private StatType scalingStat;
+    private String description;
     private int actionPointCost;
-    private int cooldown;
+    private int baseCooldown;
+    private int cooldownRemaining;
 
     // Constructor
-    public Ability (String name, int abilityId, int lastUsedTurn, int power, StatType scalingStat,
-                    int actionPointCost, int cooldown) {
+    public Ability (String name, String description, int actionPointCost, int baseCooldown) {
         this.name = name;
-        this.abilityId = abilityId;
-        this.lastUsedTurn = lastUsedTurn;
-        this.power = power;
-        this.scalingStat = scalingStat;
+        this.description = description;
         this.actionPointCost = actionPointCost;
-        this.cooldown = cooldown;
+        this.baseCooldown = baseCooldown;
+        this.cooldownRemaining = 0;
     }
 
-    // Methods
-    public int spendActionPoints(Characters user) {
-        user.getActionPoints() -= this.actionPointCost;
+    // Core Methods
+    public void use(Characters user, List<Characters> target, BattlefieldManager bf) {
+        if (!isReady()) {
+            System.out.println(name + " is still on cooldown!");
+        }
+        if (user.getCurrentActionPoints() < actionPointCost) {
+            System.out.println(user.getName() + " does not have enough AP!");
+            return;
+        }
+        System.out.println(user.getName() + " uses " + name + " on " + target.size() + " target(s).");
+
+        user.setCurrentActionPoints(user.getCurrentActionPoints() - actionPointCost);
+        putOnCooldown();
+    }
+
+    // CD Management
+    public boolean isReady() {
+        if (cooldownRemaining == 0) return true;
+        else return false;
     }
 
     public void putOnCooldown() {
-        // TODO: how are we tracking time?
-    }
-
-    public int scalingValue(Characters user) {
-        // TODO: take the user's stat and have it affect base power, return actual damage dealt
+        cooldownRemaining = baseCooldown;
     }
 
     public void resetCooldown() {
-        // TODO: how are we tracking time?
+        cooldownRemaining = 0;
     }
 
-    // Overrides due to Usable
-    @Override
-    public void use(Characters user, Characters target) {
-        if (!isUsable(user, target)) return;
-
-        if (user.getStatus() != StatusType.READY) return;
-
-        // check that the ability is not on cd
-
-        //TODO: incorporate INT
-
+    public void tickCooldown() {
+        if (cooldownRemaining > 0) cooldownRemaining--;
+        else System.out.println(getName() + " is ready to use.");
     }
 
-    @Override
-    public boolean isUsable(Characters user, Characters target) {
-        if (user.getHealthPoints() <= 0) {
-            System.out.println(user.getName() + " is not alive");
-            return false;
-        }
-        if (target.getHealthPoints() <= 0) {
-            System.out.println(target.getName() + " is not alive");
-            return false;
-        }
-        if (user.getActionPoints() <= 0) {
-            System.out.println(user.getName() + " does not have enough AP");
-            return false;
-        }
-        return true;
-    }
+    // There's already a variable for this.
+//    public int getCooldownRemaining() {}
 
-    @Override
-    public int cooldownRemaining() {
-        // TODO: how are we tracking time?
-    }
-
+    // Debug Info
     @Override
     public string toString() {
         return String.format(
-                "\n --- Ability Details ---" +
-                "\n Name: %s" +
-                "\n ID: %d" +
-                "\n Last Used: %d" +
-                "\n Power: %d" +
-                "\n Scaling Stat: %s" +
-                "\n AP Cost: %d" +
-                "\n Cooldown: %d",
-                this.name, this.abilityId, this.lastUsedTurn, this.power, this.scalingStat, this.actionPointCost,
-                this.cooldown
+                "\n--- Ability Details ---" +
+                "\nName: %s | AP Cost: %d | Cooldown: %d" +
+                "\nDescription: %s" +
+                "\nCooldown Remaining: %d",
+                this.name, this.actionPointCost, this.baseCooldown, this.description, this.cooldownRemaining
         );
     }
 
