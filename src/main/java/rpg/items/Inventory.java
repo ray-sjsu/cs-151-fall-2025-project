@@ -1,82 +1,61 @@
 package rpg.items;
 
-import java.util.List;
-import java.util.ArrayList;
 import rpg.exceptions.InventoryFullException;
+import rpg.exceptions.MaxInstancesLimitException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
 
 public class Inventory {
-
     private int slotCapacity;
-    private List<Item> items;
+    private final List<Item> items;
+    private static int instanceCount;
 
     public Inventory(int slotCapacity) {
+        if (CLASS_INSTANCE_LIMIT <= instanceCount) {
+            throw new MaxInstancesLimitException(this.getClass().getSimpleName());
+        }
+        instanceCount++;
+
         this.slotCapacity = slotCapacity;
         this.items = new ArrayList<>();
     }
 
-    public int getSlotCapacity() {
-        return slotCapacity;
+    public void addItem(Item item) {
+        if (items.size() >= slotCapacity) {
+            throw new InventoryFullException("Inventory is full! Cannot add " + item.getName());
+        }
+        items.add(item);
+        System.out.printf("Added %s to inventory.%n", item.getName());
+    }
+
+    public void removeItem(Item item) {
+        items.remove(item);
+    }
+
+    public boolean hasItem(Item item) {
+        return items.contains(item);
     }
 
     public List<Item> getItems() {
-        return items;
-    }
-
-    public void setSlotCapacity(int slotCapacity) {
-        this.slotCapacity = slotCapacity;
-    }
-
-    public void addItem(Item item) throws InventoryFullException {
-        if (!hasSpaceFor(item)) {
-            throw new InventoryFullException("Inventory is full.");
-        }
-
-        items.add(item);
-    }
-
-    public void removeItem(int itemId) {
-        items.removeIf(item -> item.getItemId() == itemId);
-    }
-
-    public boolean hasSpaceFor(Item item) {
-        int occupiedSlots = 0;
-        for (Item currentItem : this.items) {
-            occupiedSlots += currentItem.getSlotsTaken();
-        }
-
-        int availableSlots = this.slotCapacity - occupiedSlots;
-        return availableSlots >= item.getSlotsTaken();
-    }
-
-    public Item findById(int itemId) {
-        for (Item item : this.items) {
-            if (item.getItemId() == itemId) {
-                return item;
-            }
-        }
-
-        return null;
+        return new ArrayList<>(items);
     }
 
     public double totalWeight() {
-        double weight = 0.0;
-
-        for (Item item : this.items) {
-            weight += item.getWeight();
-        }
-
-        return weight;
+        return items.stream().mapToDouble(Item::getWeight).sum();
     }
 
     @Override
     public String toString() {
-        String header = String.format("--- Inventory --- \n Slot Capacity: %d", this.slotCapacity);
-        StringBuilder itemList = new StringBuilder();
-        itemList.append("Items:\n");
-
-        for(Item item : this.items) {
-            itemList.append("- ").append(item.getName()).append("\n");
+        if (items.isEmpty()) return "[Empty Inventory]";
+        StringBuilder sb = new StringBuilder("Inventory:\n");
+        for (Item i : items) {
+            sb.append(" - ").append(i).append("\n");
         }
-
-        return header + "\n\n" + itemList;
+        sb.append(String.format("Total Weight: %.2f lbs (%d/%d slots)%n",
+                totalWeight(), items.size(), slotCapacity));
+        return sb.toString();
+    }
 }
