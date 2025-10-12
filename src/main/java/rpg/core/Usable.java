@@ -1,9 +1,9 @@
 package rpg.core;
 
-import rpg.characters;
+import rpg.characters.Characters;
 
 public interface Usable {
-    void use(Characters user, Characters target);
+    int use(Characters user, Characters target);
 
     boolean isUsable(Characters user, Characters target);
 
