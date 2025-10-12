@@ -1,81 +1,39 @@
 package rpg.items;
 
-public abstract class Item {
+import rpg.core.RarityType;
+import rpg.exceptions.MaxInstancesLimitException;
 
-    private int itemId;
-    private String name;
-    private String description;
-    private double weight;
-    private RarityType rarity;
-    private int slotsTaken;
+import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
 
-    public Item(int itemId, String name, String description, double weight, RarityType rarity, int slotsTaken) {
+public class Item {
+    protected int itemId;
+    protected String name;
+    protected String description;
+    protected double weight;
+    protected RarityType rarity;
+    protected static int instanceCount;
+
+    public Item(int itemId, String name, String description, double weight, RarityType rarity) {
+        if (CLASS_INSTANCE_LIMIT <= instanceCount) {
+            throw new MaxInstancesLimitException(this.getClass().getSimpleName());
+        }
+        instanceCount++;
+
         this.itemId = itemId;
         this.name = name;
         this.description = description;
         this.weight = weight;
         this.rarity = rarity;
-        this.slotsTaken = slotsTaken;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public RarityType getRarity() {
-        return rarity;
-    }
-
-    public void setRarity(RarityType rarity) {
-        this.rarity = rarity;
-    }
-
-    public int getSlotsTaken() {
-        return slotsTaken;
-    }
-
-    public void setSlotsTaken(int slotsTaken) {
-        this.slotsTaken = slotsTaken;
-    }
+    public int getItemId() { return itemId; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public double getWeight() { return weight; }
+    public RarityType getRarity() { return rarity; }
 
     @Override
     public String toString() {
-        return String.format(
-                "\n --- Item Details ---" +
-                "\n Name: %s" +
-                "\n ID: %d" +
-                "\n Description: %s" +
-                "\n Weight: %.1f" +
-                "\n Rarity: %s" +
-                "\n Slots Taken: %d",
-                this.name, this.itemId, this.description, this.weight, this.rarity, this.slotsTaken);
+        return String.format("%s (%s) - %.2f lbs - Description: %s", name, rarity, weight, description);
     }
 }
