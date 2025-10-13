@@ -1,4 +1,4 @@
-~package rpg.items;
+package rpg.items;
 
 import rpg.characters.Characters;
 import rpg.core.RarityType;
