@@ -7,7 +7,5 @@ public interface Usable {
 
     boolean isUsable(Characters user, Characters target);
 
-    int cooldownRemaining();
-
     String toString();
 }
