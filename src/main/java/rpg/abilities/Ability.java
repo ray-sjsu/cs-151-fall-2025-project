@@ -71,7 +71,6 @@ public class Ability implements Usable {
                 startCooldown();
             }
         } catch (AbilityOnCooldownException e) {
-            System.out.println("Exception caught");
             damage = -1;
         }
 
