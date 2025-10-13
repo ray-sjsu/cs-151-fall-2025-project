@@ -1,71 +1,94 @@
 package rpg.abilities;
 
-import rpg.battlefield.BattlefieldManager;
-import rpg.core.StatType;
 import rpg.characters.Characters;
+import rpg.core.StatType;
+import rpg.core.Usable;
+import rpg.exceptions.AbilityOnCooldownException;
+import rpg.exceptions.MaxInstancesLimitException;
 
-public class Ability {
+import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
+
+public class Ability implements Usable {
+    private final int abilityId;
     private String name;
     private String description;
-    private int actionPointCost;
-    private int baseCooldown;
-    private int cooldownRemaining;
+
+    private final StatType scalingStat;
+    private final int basePower;
+
+    private int currentCooldownDuration;
+    private int cooldownDuration;
+
+    private static int instanceCount;
 
     // Constructor
-    public Ability (String name, String description, int actionPointCost, int baseCooldown) {
+    public Ability (int abilityId, String name, String description, StatType scalingStat, int basePower,
+                    int currentCooldownDuration, int cooldownDuration) {
+        if (CLASS_INSTANCE_LIMIT <= instanceCount) {
+            throw new MaxInstancesLimitException(this.getClass().getSimpleName());
+        }
+        instanceCount++;
+
+        this.abilityId = abilityId;
         this.name = name;
         this.description = description;
-        this.actionPointCost = actionPointCost;
-        this.baseCooldown = baseCooldown;
-        this.cooldownRemaining = 0;
+        this.scalingStat = scalingStat;
+        this.basePower = basePower;
+        this.currentCooldownDuration = currentCooldownDuration;
+        this.cooldownDuration = cooldownDuration;
     }
 
-    // Core Methods
-    public void use(Characters user, List<Characters> target, BattlefieldManager bf) {
-        if (!isReady()) {
-            System.out.println(name + " is still on cooldown!");
-        }
-        if (user.getCurrentActionPoints() < actionPointCost) {
-            System.out.println(user.getName() + " does not have enough AP!");
-            return;
-        }
-        System.out.println(user.getName() + " uses " + name + " on " + target.size() + " target(s).");
-
-        user.setCurrentActionPoints(user.getCurrentActionPoints() - actionPointCost);
-        putOnCooldown();
+    // Methods
+    public void startCooldown() {
+        this.currentCooldownDuration = cooldownDuration;
     }
 
-    // CD Management
-    public boolean isReady() {
-        if (cooldownRemaining == 0) return true;
-        else return false;
+    public void reduceCooldown() {
+        if (currentCooldownDuration > 0) currentCooldownDuration--;
     }
 
-    public void putOnCooldown() {
-        cooldownRemaining = baseCooldown;
+    public boolean isOnCooldown() {
+        return currentCooldownDuration > 0;
     }
 
-    public void resetCooldown() {
-        cooldownRemaining = 0;
+    // Getters/Setters
+    public String getName() {
+        return this.name;
     }
 
-    public void tickCooldown() {
-        if (cooldownRemaining > 0) cooldownRemaining--;
-        else System.out.println(getName() + " is ready to use.");
-    }
-
-    // There's already a variable for this.
-//    public int getCooldownRemaining() {}
-
-    // Debug Info
+    // Overrides
     @Override
-    public string toString() {
+    public int use(Characters user, Characters target) {
+        int damage = 0;
+
+        if (isOnCooldown()) {
+            throw new AbilityOnCooldownException(name + " is on cooldown!");
+        } else {
+            int statValue = user.getStat(scalingStat);
+            damage = basePower + (statValue / 2);
+            target.takeDamage(damage);
+            startCooldown();
+        }
+
+        return damage;
+    }
+
+    @Override
+    public boolean isUsable(Characters user, Characters target) {
+        return currentCooldownDuration == 0 && user.canAct() && target.getHp() > 0;
+    }
+
+    @Override
+    public int cooldownRemaining() {
+        return currentCooldownDuration;
+    }
+
+    @Override
+    public String toString() {
         return String.format(
                 "\n--- Ability Details ---" +
-                "\nName: %s | AP Cost: %d | Cooldown: %d" +
-                "\nDescription: %s" +
-                "\nCooldown Remaining: %d",
-                this.name, this.actionPointCost, this.baseCooldown, this.description, this.cooldownRemaining
+                "\nName: %s | Power: %d" +
+                "\nCooldown Remaining: %d / %d", name, basePower, currentCooldownDuration, cooldownDuration
         );
     }
 
