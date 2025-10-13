@@ -14,8 +14,7 @@ import rpg.items.Weapon;
 import java.util.List;
 import java.util.Scanner;
 
-import static rpg.ui.Menus.showLevelUpStats;
-import static rpg.ui.Menus.useAbilityMenu;
+import static rpg.ui.Menus.*;
 import static rpg.ui.Scene.*;
 
 public class Main {
@@ -56,6 +55,7 @@ public class Main {
             System.out.println("4. Wait (Skip turn)");
             System.out.println("5. View Inventory");
             System.out.println("6. View Turn History");
+            System.out.println("7. View Player and Enemy stats");
             System.out.print("> ");
 
             String choice = scanner.nextLine();
@@ -104,7 +104,12 @@ public class Main {
                         scanner.nextLine();
                         continue;
                     }
-                    // menu for default stats?
+                    case "7" -> {
+                        printCharacterComparison(player, enemy);
+                        System.out.println("\nPress ENTER to return...");
+                        scanner.nextLine();
+                        continue;
+                    }
                     default -> {
                         lastActionText = "Invalid choice.";
                         continue;

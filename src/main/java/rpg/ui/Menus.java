@@ -3,6 +3,7 @@ package rpg.ui;
 import rpg.abilities.Ability;
 import rpg.battlefield.BattlefieldManager;
 import rpg.battlefield.TurnAction;
+import rpg.characters.Characters;
 import rpg.characters.Enemy;
 import rpg.characters.PlayableCharacter;
 import rpg.core.ActionType;
@@ -39,6 +40,12 @@ public class Menus {
                 oldDex, player.getStat(StatType.DEX),
                 player.getStat(StatType.DEX) - oldDex);
 
+    }
+    public static void printCharacterComparison(Characters character1, Characters character2) {
+        clearScreen();
+        System.out.println("\n--- Character Comparison ---");
+        System.out.print(character1);
+        System.out.println(character2);
     }
     public static String useAbilityMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
         List<Ability> abilities = player.getAbilities();

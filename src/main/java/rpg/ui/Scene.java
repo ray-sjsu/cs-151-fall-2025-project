@@ -4,7 +4,7 @@ import rpg.characters.Enemy;
 import rpg.characters.PlayableCharacter;
 
 public class Scene {
-    private static final int SCREEN_WIDTH = 100;
+    public static final int SCREEN_WIDTH = 100;
     private static final int SPRITE_SPACING = 20;
 
     public static String centerText(String text) {
