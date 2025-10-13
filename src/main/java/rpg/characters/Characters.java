@@ -1,174 +1,151 @@
 package rpg.characters;
 
+import rpg.abilities.Ability;
+import rpg.core.StatType;
+import rpg.core.StatusType;
+import rpg.exceptions.MaxInstancesLimitException;
+import rpg.items.Inventory;
+import rpg.items.Weapon;
+
+import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import rpg.items.Inventory;
-import rpg.abilities.Ability;
 
 public abstract class Characters {
-    protected String name;
     protected int characterId;
-
+    protected String name;
     protected String description;
-    protected int level;
 
-    protected int maxHealth;
-    protected int currentHealth;
-    protected int maxActionPoints;
-    protected int currentActionPoints;
+    protected int level;
+    protected int hp;
 
     protected Inventory inventory;
+    protected Weapon equippedWeapon;
     protected List<Ability> abilities;
     protected Map<StatType, Integer> stats;
     protected StatusType status;
 
+    protected static int instanceCount;
+
     // Constructor
-    public Characters(String name, int characterId, String description, int level, int maxHealth,
-                      int currentHealth, int maxActionPoints, int currentActionPoints, Inventory inventory,
-                      List<Ability> abilities, Map<StatType, Integer> stats, statusType status) {
-        this.name = name;
+    public Characters(int characterId, String name, String description, int level, int maxHp) {
+        if (CLASS_INSTANCE_LIMIT <= instanceCount) {
+            throw new MaxInstancesLimitException(this.getClass().getSimpleName());
+        }
+        instanceCount++;
+
         this.characterId = characterId;
+        this.name = name;
         this.description = description;
         this.level = level;
-        this.maxHealth = maxHealth;
-        this.currentHealth = currentHealth;
-        this.maxActionPoints = maxActionPoints;
-        this.currentActionPoints = currentActionPoints;
-        this.inventory = inventory;
-        this.abilities = abilities;
-        this.stats = stats;
-        this.status = status;
+        this.hp = maxHp;
+        this.inventory = new Inventory(10);
+        this.abilities = new ArrayList<>();
+        this.stats = new EnumMap<>(StatType.class);
+        this.status = StatusType.READY;
+
+        // New players start with STR 5, INT 5, DEX 5
+        for (StatType type : StatType.values()) {
+            this.stats.put(type, 5);
+        }
     }
 
-    // Methods required of subclasses
-    public abstract int getStat(StatType type) {
-        return getStats().get(type);
-    }
-    public abstract void setStat(StatType type, int value) {
-        getStats().put(type, value);
-    }
+    // Methods
+    public int attack(Characters target) {
+        int damage;
 
-    public abstract void attack(Characters target);
-    public abstract void takeDamage(int amount);
+        if (equippedWeapon != null) {
+            damage = equippedWeapon.calculateDamageWithCriticalChance(this, target);
+        } else {
+            damage = getStat(StatType.STR);
+        }
 
-    public abstract void useAbility(Ability ability, Characters target) throws AbilityOnCooldownException {
-        if (ability.isReady()) {
-            ability.use(this, target, bf);
-            // Need to discuss what abilities will do to the target
-            ability.putOnCooldown();
-            System.out.println(this.getName() + " used " + ability.getName() + " on " +  target.getName() + ".");
-        } else throw new AbilityOnCooldownException(ability.getName() + " is not ready to use!");
+        target.takeDamage(damage);
+        return damage;
     }
 
-    public abstract void startTurn();
-
-    public abstract boolean canAct() {
-        if (getStatus() != StatusType.READY) return false;
-        else return true;
+    public void takeDamage(int amount) {
+        hp -= amount;
+        if (hp <= 0) {
+            hp = 0;
+            status = StatusType.DEAD;
+        }
     }
 
-    // Basic utilities
-    public boolean isAlive() {
-        return currentHealth > 0;
-    }
-
-    public void restoreActionPoints() {
-        currentActionPoints = maxActionPoints;
+    public boolean canAct() {
+        return hp > 0 && status == StatusType.READY;
     }
 
     // Getters/Setters
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
+    public Weapon getEquippedWeapon() {
+        return this.equippedWeapon;
     }
 
-    public int getCharacterId() {
-        return characterId;
-    }
-    public void setCharacterId(int characterId) {
-        this.characterId = characterId;
-    }
+    public void equipWeapon(Weapon weapon) {
+        if (!inventory.getItems().contains(weapon)) {
+            System.out.printf("%s does not have %s in their inventory!%n", name, weapon.getName());
+            return;
+        }
 
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-    }
-
-    public int getCurrentHealth() {
-        return currentHealth;
-    }
-    public void setCurrentHealth(int currentHealth) {
-        this.currentHealth = currentHealth;
-    }
-
-    public int getMaxActionPoints() {
-        return maxActionPoints;
-    }
-    public void setMaxActionPoints(int maxActionPoints) {
-        this.maxActionPoints = maxActionPoints;
-    }
-
-    public int getCurrentActionPoints() {
-        return currentactionPoints;
-    }
-    public void setCurrrentActionPoints(int currentActionPoints) {
-        this.currentActionPoints = maxActionPoints;
-    }
-
-    public Inventory getInventory() {
-        return inventory;
-    }
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+        this.equippedWeapon = weapon;
+        System.out.printf("%s equips %s.%n", name, weapon.getName());
     }
 
     public List<Ability> getAbilities() {
         return abilities;
     }
-    public void setAbilities(List<Ability> abilities) {
-        this.abilities = abilities;
+
+    public void addAbility(Ability ability) {
+        if (abilities == null) abilities = new ArrayList<>();
+        abilities.add(ability);
     }
 
-    public Map<StatType, Integer> getStats() {
-        return stats;
+    public void removeAbility(Ability ability) {
+        if (abilities != null) abilities.remove(ability);
     }
-    public void setStats(Map<StatType, Integer> stats) {
-        this.stats = stats;
+
+    // Basic Getters/Setters
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
     public StatusType getStatus() {
-        return status;
+        return this.status;
     }
     public void setStatus(StatusType status) {
         this.status = status;
     }
 
+    public int getStat(StatType type) {
+        return stats.getOrDefault(type, 0);
+    }
+    public void setStat(StatType type, int value) {
+        stats.put(type, value);
+    }
+
+    // Overrides
     @Override
-    public abstract String toString() {
+    public String toString() {
         return String.format(
-                "\nCharacter Info:" +
-                "\n%s (Level %d)" +
-                "\nHP: %d/%d | AP: %d/%d" +
-                "\nStatus: %s",
-                name, level, maxHealth, currentHealth, maxActionPoints, currentActionPoints, status
+                "\n--- Character Info ---" +
+                "\n%s (Level %d) | HP: %d | Status: %s" +
+                "\nEquipped Weapon: %s" +
+                "\nDescription: %s", name, level, hp, status, equippedWeapon, description
         );
     }
 
