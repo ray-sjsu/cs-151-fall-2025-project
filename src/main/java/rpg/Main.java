@@ -33,6 +33,8 @@ public class Main {
         player.equipWeapon(sword);
         player.addAbility(new Ability(1, "Flambé\uD83D\uDD25", "INT-scaled attack that sets the enemy on fire.", StatType.INT, 20, 0, 2));
         player.addAbility(new Ability(2, "Casted Iron\uD83C\uDF73", "STR-scaled attack for hitting un-pleasant customers.", StatType.STR, 30, 0, 3));
+        player.setStat(StatType.STR, 10);
+        player.setStat(StatType.INT, 7);
 
         Enemy enemy = new Enemy(1, "Goblin", "Looks like a frog.", 1, 50);
         Weapon fists = new Weapon(1, "Hands", "Can't catch these.",
@@ -46,7 +48,7 @@ public class Main {
 
         while (true) {
             clearScreen();
-            printBattleUI(player, enemy, lastActionText);
+            printBattleUI(player, enemy, lastActionText, battlefield);
 
             System.out.println("\nChoose an action:");
             System.out.println("1. Attack");
@@ -77,7 +79,11 @@ public class Main {
                     }
                     case "3" -> {
                         String result = useAbilityMenu(scanner, player, enemy, battlefield);
-                        if (result != null) lastActionText = result;
+                        if (result != null) {
+                            lastActionText = result;
+                        } else {
+                            continue;
+                        }
                     }
                     case "4" -> {
                         lastActionText = String.format("Player %s skipped their turn!\n", player.getName());
@@ -91,11 +97,12 @@ public class Main {
                         continue;
                     }
                     case "6" -> {
-                        System.out.println("\nBattle History");
+                        System.out.printf("\nBattle History - Total Turns: %d", battlefield.getTurnCount());
                         List<TurnAction> history = battlefield.getTurnHistory();
                         if (history.isEmpty()) {
                             System.out.println("No actions have been taken yet.");
                         } else {
+                            System.out.println();
                             for (int i = 0; i < history.size(); i++) {
                                 System.out.printf("%2d. %s%n", i + 1, history.get(i));
                             }
@@ -111,7 +118,6 @@ public class Main {
                         continue;
                     }
                     default -> {
-                        lastActionText = "Invalid choice.";
                         continue;
                     }
                 }
@@ -120,13 +126,13 @@ public class Main {
                 // Check after player turn
                 if (battlefield.isBattleOver()) {
                     clearScreen();
-                    printBattleUI(player, enemy, lastActionText);
+                    printBattleUI(player, enemy, lastActionText, battlefield);
                     try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
                     break;
                 }
 
                 // Start of enemy turn
-                if (enemy.fleeChance(25)) {
+                if (enemy.fleeChance(10)) {
                     lastActionText = enemy.getName() + " ran away!";
                     battlefield.addTurnAction(new TurnAction(enemy, ActionType.WAIT, StatusType.MISSING, lastActionText));
                     break;
@@ -142,6 +148,8 @@ public class Main {
                 for (Ability a : player.getAbilities()) {
                     a.reduceCooldown();
                 }
+
+                battlefield.incrementTurnCount();
             } else {
                 break;
             }
@@ -149,7 +157,7 @@ public class Main {
 
         // End of battle
         clearScreen();
-        printBattleUI(player, enemy, lastActionText);
+        printBattleUI(player, enemy, lastActionText, battlefield);
 
         if (battlefield.getWinner() instanceof PlayableCharacter) {
             showLevelUpStats(player);

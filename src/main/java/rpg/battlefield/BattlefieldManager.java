@@ -12,7 +12,7 @@ import java.util.*;
 import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
 
 public class BattlefieldManager {
-    private int turnCount = 0;
+    private int turnCount = 1;
     private final Queue<TurnAction> turnOrder = new ArrayDeque<>();
     private PlayableCharacter player;
     private Enemy enemy;
@@ -33,13 +33,14 @@ public class BattlefieldManager {
         turnOrder.add(new TurnAction(player, ActionType.BEGIN_TURN, StatusType.READY, "begin"));
         turnOrder.add(new TurnAction(enemy, ActionType.BEGIN_TURN, StatusType.IDLE,"begin"));
 
-        turnCount = 0;
     }
 
     public void addTurnAction(TurnAction action) {
         turnOrder.add(action);
-        turnCount++;
     }
+    public int getTurnCount() { return this.turnCount; }
+
+    public void incrementTurnCount() { this.turnCount++;}
 
     public List<TurnAction> getTurnHistory() {
         return new ArrayList<>(turnOrder);

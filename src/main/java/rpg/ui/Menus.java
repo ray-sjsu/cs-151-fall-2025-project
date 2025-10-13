@@ -84,6 +84,10 @@ public class Menus {
             Ability chosen = abilities.get(abilityIndex);
 
             int damage = chosen.use(player, enemy);
+            if (damage == -1 ) {
+                System.out.println("Ability on cooldown. Try again.");
+                continue;
+            }
             bf.addTurnAction(new TurnAction(player, ActionType.ABILITY, StatusType.READY, chosen));
             return String.format("%s uses %s on %s for %d damage!\n", player.getName(), chosen.getName(), enemy.getName(), damage);
         }
