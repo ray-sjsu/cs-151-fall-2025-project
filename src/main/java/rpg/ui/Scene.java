@@ -53,7 +53,7 @@ public class Scene {
 
         System.out.println();
 
-        System.out.println(centerText("\uD83D\uDC68\u200D\uD83C\uDF73 \uD83D\uDD2A" + " ".repeat(SPRITE_SPACING) + "\uD83E\uDD1B \uD83D\uDC38"));
+        System.out.println(centerText("\uD83D\uDC68\u200D\uD83C\uDF73 \uD83D\uDD2A" + " ".repeat(SPRITE_SPACING) + "\uD83E\uDE7C \uD83D\uDC38"));
         System.out.println();
         System.out.println(centerText(player.getName() + " ".repeat(SPRITE_SPACING) + enemy.getName()));
 

@@ -96,8 +96,6 @@ public class Menus {
         return null;
     }
     public static void endGameMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
-        clearScreen();
-
         while (true) {
             // Check winner
             if (bf.getWinner() instanceof PlayableCharacter) {
@@ -120,10 +118,7 @@ public class Menus {
 
             switch (choice) {
                 case "1" -> {
-                    System.out.println(player.getName() + "'s Inventory:");
-                    System.out.println(player.getInventory());
-                    System.out.println("Press ENTER to return...");
-                    scanner.nextLine();
+                    manageInventoryMenu(scanner, player);
                 }
                 case "2" -> {
                     System.out.printf("\nBattle History - Total Turns: %d%n", bf.getTurnCount());
@@ -150,6 +145,78 @@ public class Menus {
                     scanner.close();
                     return;
                 }
+                default -> {
+                    System.out.println("Invalid choice. Try again.");
+                    System.out.println("\nPress ENTER to continue...");
+                    scanner.nextLine();
+                }
+            }
+        }
+    }
+    public static void manageInventoryMenu(Scanner scanner, PlayableCharacter player) {
+        while (true) {
+            clearScreen();
+            System.out.println("\n" + player.getName() + "'s Inventory:");
+            System.out.println(player.getInventory());
+
+            System.out.println("\nChoose an action:");
+            System.out.println("1. Remove Item");
+            System.out.println("2. Exit Inventory");
+            System.out.print("\n> ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1" -> {
+                    List<Item> availableItems = player.getInventory().getItems();
+                    Item equippedWeapon = player.getEquippedWeapon();
+
+                    if (availableItems.isEmpty()) {
+                        System.out.println("Inventory is empty. Nothing to remove.");
+                        System.out.println("\nPress ENTER to continue...");
+                        scanner.nextLine();
+                        break;
+                    }
+
+                    System.out.println("\nSelect an item to remove:");
+                    for (int i = 0; i < availableItems.size(); i++) {
+                        Item item = availableItems.get(i);
+                        if (item.equals(equippedWeapon)) {
+                            System.out.printf("%d. %s (Equipped)%n", i + 1, item.getName());
+                        } else {
+                            System.out.printf("%d. %s%n", i + 1, item.getName());
+                        }
+                    }
+
+                    System.out.print("\n> ");
+                    String input = scanner.nextLine();
+
+                    try {
+                        int index = Integer.parseInt(input) - 1;
+                        if (index >= 0 && index < availableItems.size()) {
+                            Item selectedItem = availableItems.get(index);
+
+                            if (selectedItem.equals(equippedWeapon)) {
+                                System.out.println("You cannot remove your equipped weapon!");
+                            } else {
+                                player.getInventory().removeItem(selectedItem);
+                                System.out.println("Removed: " + selectedItem.getName());
+                            }
+                        } else {
+                            System.out.println("Invalid item number.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid number.");
+                    }
+
+                    System.out.println("\nPress ENTER to continue...");
+                    scanner.nextLine();
+                }
+
+                case "2" -> {
+                    System.out.println("Exiting inventory...");
+                    return;
+                }
+
                 default -> {
                     System.out.println("Invalid choice. Try again.");
                     System.out.println("\nPress ENTER to continue...");

@@ -9,6 +9,7 @@ import rpg.core.ActionType;
 import rpg.core.RarityType;
 import rpg.core.StatType;
 import rpg.core.StatusType;
+import rpg.items.Item;
 import rpg.items.Weapon;
 
 import java.util.List;
@@ -37,10 +38,11 @@ public class Main {
         player.setStat(StatType.INT, 7);
 
         Enemy enemy = new Enemy(1, "Goblin", "Looks like a frog.", 1, 50);
-        Weapon fists = new Weapon(1, "Hands", "Can't catch these.",
+        Weapon stick = new Weapon(1, "Stick", "A long stick.",
                 2.0, RarityType.RARE, 8, 12, 0.40);
-        enemy.getInventory().addItem(fists);
-        enemy.equipWeapon(fists);
+        enemy.getInventory().addItem(stick);
+        enemy.getInventory().addItem(new Item(44, "Gold Coin", "A shiny coin.", 0.1, RarityType.COMMON));
+        enemy.equipWeapon(stick);
 
         battlefield.initCombat(player, enemy);
 
@@ -59,7 +61,7 @@ public class Main {
             System.out.println("\nChoose an action:");
             System.out.println("1. Attack");
             System.out.printf("2. Heal (for %d HP)\n", healAmount);
-            System.out.println("3. Open Ability Menu");
+            System.out.println("3. View Ability Menu");
             System.out.println("4. Rest (Reduce used abilities cooldowns by an additional 1)");
             System.out.println("5. Wait (Skip turn)");
             System.out.println("6. View Inventory");
@@ -102,10 +104,7 @@ public class Main {
                         battlefield.addTurnAction(new TurnAction(player, ActionType.WAIT, StatusType.IDLE, lastActionText));
                     }
                     case "6" -> {
-                        System.out.println(player.getName() + "'s Inventory:");
-                        System.out.println(player.getInventory());
-                        System.out.println("Press ENTER to return...");
-                        scanner.nextLine();
+                        manageInventoryMenu(scanner, player);
                         continue;
                     }
                     case "7" -> {
@@ -139,6 +138,10 @@ public class Main {
                         System.out.println("\nPress ENTER to continue...");
                         scanner.nextLine();
                     }
+                }
+
+                if (battlefield.isBattleOver()) {
+                    break;
                 }
 
                 // Start of enemy turn

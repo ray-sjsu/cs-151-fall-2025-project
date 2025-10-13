@@ -1,7 +1,6 @@
 package rpg.characters;
 
 import rpg.core.StatusType;
-import rpg.core.RarityType;
 import rpg.items.Item;
 
 import java.util.ArrayList;
@@ -28,9 +27,8 @@ public class Enemy extends Characters {
     }
 
     public List<Item> dropLoot() {
-        List<Item> loot = new ArrayList<>();
+        List<Item> loot = new ArrayList<>(inventory.getItems());
 
-        loot.add(new Item(1, "Gold Coin", "A shiny coin.", 0.1, RarityType.COMMON));
         System.out.printf("%s drops loot!%n", name);
         return loot;
     }
