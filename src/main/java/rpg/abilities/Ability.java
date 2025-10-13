@@ -82,7 +82,6 @@ public class Ability implements Usable {
         return currentCooldownDuration == 0 && user.canAct() && target.getHp() > 0;
     }
 
-    @Override
     public int cooldownRemaining() {
         return currentCooldownDuration;
     }
