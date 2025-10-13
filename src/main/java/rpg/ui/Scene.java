@@ -28,6 +28,7 @@ public class Scene {
         }
     }
     public static void clearScreen() {
+        System.out.print("\n".repeat(6));
         System.out.flush();
     }
     public static void printBattleUI(PlayableCharacter player, Enemy enemy, String actionText, BattlefieldManager bf) {

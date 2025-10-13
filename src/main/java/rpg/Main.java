@@ -52,6 +52,10 @@ public class Main {
             clearScreen();
             printBattleUI(player, enemy, lastActionText, battlefield);
 
+            if (battlefield.isBattleOver()) {
+                break;
+            }
+
             System.out.println("\nChoose an action:");
             System.out.println("1. Attack");
             System.out.printf("2. Heal (for %d HP)\n", healAmount);
@@ -62,6 +66,7 @@ public class Main {
             System.out.println("7. View Turn History");
             System.out.println("8. View Player and Enemy Stats");
             System.out.println("9. Exit Game");
+            System.out.print("\n".repeat(2));
             System.out.print("> ");
             String choice = scanner.nextLine();
 
@@ -130,17 +135,10 @@ public class Main {
                         return;
                     }
                     default -> {
-                        continue;
+                        System.out.println("Invalid choice. Try again.");
+                        System.out.println("\nPress ENTER to continue...");
+                        scanner.nextLine();
                     }
-                }
-
-
-                // Check after player turn
-                if (battlefield.isBattleOver()) {
-                    clearScreen();
-                    printBattleUI(player, enemy, lastActionText, battlefield);
-                    try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-                    break;
                 }
 
                 // Start of enemy turn

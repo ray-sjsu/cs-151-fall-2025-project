@@ -9,6 +9,7 @@ import rpg.characters.PlayableCharacter;
 import rpg.core.ActionType;
 import rpg.core.StatType;
 import rpg.core.StatusType;
+import rpg.items.Item;
 
 import java.util.List;
 import java.util.Scanner;
@@ -95,26 +96,36 @@ public class Menus {
         return null;
     }
     public static void endGameMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
-        while (true) {
-            clearScreen();
-            // printBattleUI(player, enemy, lastActionText, bf);
+        clearScreen();
 
+        while (true) {
             // Check winner
             if (bf.getWinner() instanceof PlayableCharacter) {
                 showLevelUpStats(player);
+                System.out.printf("Enemy %s has dropped some loot.\n", enemy.getName());
+                List<Item> enemyLoot = enemy.dropLoot();
+                System.out.printf("Player %s has looted Enemy %s.\n", player.getName(), enemy.getName());
+                player.loot(enemyLoot);
             }
-            System.out.println(bf.getWinner());
 
             // Menu
             System.out.println("\nChoose an action:");
-            System.out.println("1. View Turn History");
-            System.out.println("2. View Player and Enemy stats");
-            System.out.println("3. End game");
+            System.out.println("1. View Inventory");
+            System.out.println("2. View Turn History");
+            System.out.println("3. View Player and Enemy stats");
+            System.out.println("4. End game");
+            System.out.print("\n".repeat(2));
             System.out.print("> ");
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1" -> {
+                    System.out.println(player.getName() + "'s Inventory:");
+                    System.out.println(player.getInventory());
+                    System.out.println("Press ENTER to return...");
+                    scanner.nextLine();
+                }
+                case "2" -> {
                     System.out.printf("\nBattle History - Total Turns: %d%n", bf.getTurnCount());
                     List<TurnAction> history = bf.getTurnHistory();
 
@@ -129,19 +140,16 @@ public class Menus {
                     System.out.println("\nPress ENTER to return...");
                     scanner.nextLine();
                 }
-
-                case "2" -> {
+                case "3" -> {
                     printCharacterComparison(player, enemy);
                     System.out.println("\nPress ENTER to return...");
                     scanner.nextLine();
                 }
-
-                case "3" -> {
+                case "4" -> {
                     System.out.println("\nThanks for playing!");
                     scanner.close();
                     return;
                 }
-
                 default -> {
                     System.out.println("Invalid choice. Try again.");
                     System.out.println("\nPress ENTER to continue...");
