@@ -94,4 +94,60 @@ public class Menus {
 
         return null;
     }
+    public static void endGameMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
+        while (true) {
+            clearScreen();
+            // printBattleUI(player, enemy, lastActionText, bf);
+
+            // Check winner
+            if (bf.getWinner() instanceof PlayableCharacter) {
+                showLevelUpStats(player);
+            }
+            System.out.println(bf.getWinner());
+
+            // Menu
+            System.out.println("\nChoose an action:");
+            System.out.println("1. View Turn History");
+            System.out.println("2. View Player and Enemy stats");
+            System.out.println("3. End game");
+            System.out.print("> ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1" -> {
+                    System.out.printf("\nBattle History - Total Turns: %d%n", bf.getTurnCount());
+                    List<TurnAction> history = bf.getTurnHistory();
+
+                    if (history.isEmpty()) {
+                        System.out.println("No actions have been taken yet.");
+                    } else {
+                        for (int i = 0; i < history.size(); i++) {
+                            System.out.printf("%2d. %s%n", i + 1, history.get(i));
+                        }
+                    }
+
+                    System.out.println("\nPress ENTER to return...");
+                    scanner.nextLine();
+                }
+
+                case "2" -> {
+                    printCharacterComparison(player, enemy);
+                    System.out.println("\nPress ENTER to return...");
+                    scanner.nextLine();
+                }
+
+                case "3" -> {
+                    System.out.println("\nThanks for playing!");
+                    scanner.close();
+                    return;
+                }
+
+                default -> {
+                    System.out.println("Invalid choice. Try again.");
+                    System.out.println("\nPress ENTER to continue...");
+                    scanner.nextLine();
+                }
+            }
+        }
+    }
 }

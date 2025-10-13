@@ -45,21 +45,24 @@ public class Main {
         battlefield.initCombat(player, enemy);
 
         String lastActionText = centerText("The battle begins!");
+        int healAmount = 5;
 
+        // Start of battle
         while (true) {
             clearScreen();
             printBattleUI(player, enemy, lastActionText, battlefield);
 
             System.out.println("\nChoose an action:");
             System.out.println("1. Attack");
-            System.out.println("2. Heal");
-            System.out.println("3. Use Ability");
-            System.out.println("4. Wait (Skip turn)");
-            System.out.println("5. View Inventory");
-            System.out.println("6. View Turn History");
-            System.out.println("7. View Player and Enemy stats");
+            System.out.printf("2. Heal (for %d HP)\n", healAmount);
+            System.out.println("3. Open Ability Menu");
+            System.out.println("4. Rest (Reduce used abilities cooldowns by an additional 1)");
+            System.out.println("5. Wait (Skip turn)");
+            System.out.println("6. View Inventory");
+            System.out.println("7. View Turn History");
+            System.out.println("8. View Player and Enemy Stats");
+            System.out.println("9. Exit Game");
             System.out.print("> ");
-
             String choice = scanner.nextLine();
 
             // Continue battle
@@ -72,7 +75,6 @@ public class Main {
                         battlefield.addTurnAction(new TurnAction(player, ActionType.ATTACK, StatusType.READY, lastActionText));
                     }
                     case "2" -> {
-                        int healAmount = 5;
                         player.heal(healAmount);
                         lastActionText = String.format("Player %s heals for %d HP!\n", player.getName(), healAmount);
                         battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
@@ -86,17 +88,22 @@ public class Main {
                         }
                     }
                     case "4" -> {
+                        player.rest();
+                        lastActionText = String.format("Player %s rested to reduce all used abilities cooldowns by an additional 1\n", player.getName());
+                        battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
+                    }
+                    case "5" -> {
                         lastActionText = String.format("Player %s skipped their turn!\n", player.getName());
                         battlefield.addTurnAction(new TurnAction(player, ActionType.WAIT, StatusType.IDLE, lastActionText));
                     }
-                    case "5" -> {
+                    case "6" -> {
                         System.out.println(player.getName() + "'s Inventory:");
                         System.out.println(player.getInventory());
                         System.out.println("Press ENTER to return...");
                         scanner.nextLine();
                         continue;
                     }
-                    case "6" -> {
+                    case "7" -> {
                         System.out.printf("\nBattle History - Total Turns: %d", battlefield.getTurnCount());
                         List<TurnAction> history = battlefield.getTurnHistory();
                         if (history.isEmpty()) {
@@ -111,11 +118,16 @@ public class Main {
                         scanner.nextLine();
                         continue;
                     }
-                    case "7" -> {
+                    case "8" -> {
                         printCharacterComparison(player, enemy);
                         System.out.println("\nPress ENTER to return...");
                         scanner.nextLine();
                         continue;
+                    }
+                    case "9" -> {
+                        System.out.println("Thanks for playing!");
+                        scanner.close();
+                        return;
                     }
                     default -> {
                         continue;
@@ -156,15 +168,6 @@ public class Main {
         }
 
         // End of battle
-        clearScreen();
-        printBattleUI(player, enemy, lastActionText, battlefield);
-
-        if (battlefield.getWinner() instanceof PlayableCharacter) {
-            showLevelUpStats(player);
-        }
-
-        System.out.println(battlefield.getWinner());
-        System.out.println("\nThanks for playing!");
-        scanner.close();
+        endGameMenu(scanner, player, enemy, battlefield);
     }
 }
