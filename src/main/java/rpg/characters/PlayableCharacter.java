@@ -1,5 +1,6 @@
 package rpg.characters;
 
+import rpg.abilities.Ability;
 import rpg.core.StatType;
 import rpg.exceptions.InventoryFullException;
 import rpg.items.Item;
@@ -23,6 +24,12 @@ public class PlayableCharacter extends Characters {
         setStat(StatType.STR, getStat(StatType.STR) + 1);
         setStat(StatType.INT, getStat(StatType.INT) + 1);
         setStat(StatType.DEX, getStat(StatType.DEX) + 1);
+    }
+
+    public void rest() {
+        for (Ability ability : abilities) {
+            ability.reduceCooldown();
+        }
     }
 
     public void loot(List<Item> items) {
