@@ -3,6 +3,7 @@ package rpg.ui;
 import rpg.abilities.Ability;
 import rpg.battlefield.BattlefieldManager;
 import rpg.battlefield.TurnAction;
+import rpg.characters.Characters;
 import rpg.characters.Enemy;
 import rpg.characters.PlayableCharacter;
 import rpg.core.ActionType;
@@ -39,6 +40,12 @@ public class Menus {
                 oldDex, player.getStat(StatType.DEX),
                 player.getStat(StatType.DEX) - oldDex);
 
+    }
+    public static void printCharacterComparison(Characters character1, Characters character2) {
+        clearScreen();
+        System.out.println("\n--- Character Comparison ---");
+        System.out.print(character1);
+        System.out.println(character2);
     }
     public static String useAbilityMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
         List<Ability> abilities = player.getAbilities();
@@ -77,6 +84,10 @@ public class Menus {
             Ability chosen = abilities.get(abilityIndex);
 
             int damage = chosen.use(player, enemy);
+            if (damage == -1 ) {
+                System.out.println("Ability on cooldown. Try again.");
+                continue;
+            }
             bf.addTurnAction(new TurnAction(player, ActionType.ABILITY, StatusType.READY, chosen));
             return String.format("%s uses %s on %s for %d damage!\n", player.getName(), chosen.getName(), enemy.getName(), damage);
         }

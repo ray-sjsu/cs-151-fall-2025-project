@@ -1,10 +1,11 @@
 package rpg.ui;
 
+import rpg.battlefield.BattlefieldManager;
 import rpg.characters.Enemy;
 import rpg.characters.PlayableCharacter;
 
 public class Scene {
-    private static final int SCREEN_WIDTH = 100;
+    public static final int SCREEN_WIDTH = 100;
     private static final int SPRITE_SPACING = 20;
 
     public static String centerText(String text) {
@@ -29,7 +30,9 @@ public class Scene {
     public static void clearScreen() {
         System.out.flush();
     }
-    public static void printBattleUI(PlayableCharacter player, Enemy enemy, String actionText) {
+    public static void printBattleUI(PlayableCharacter player, Enemy enemy, String actionText, BattlefieldManager bf) {
+        System.out.println("=".repeat(SCREEN_WIDTH));
+        System.out.println(centerText(String.format("Turn Number %d", bf.getTurnCount())));
         System.out.println("=".repeat(SCREEN_WIDTH));
         System.out.printf("%-15s Lv.%d | HP: %d | Weapon: %-10s%n",
                 player.getName(),

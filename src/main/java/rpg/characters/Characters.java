@@ -7,12 +7,12 @@ import rpg.exceptions.MaxInstancesLimitException;
 import rpg.items.Inventory;
 import rpg.items.Weapon;
 
-import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
+import static rpg.exceptions.MaxInstancesLimitException.CLASS_INSTANCE_LIMIT;
 
 public abstract class Characters {
     protected int characterId;
@@ -145,7 +145,9 @@ public abstract class Characters {
                 "\n--- Character Info ---" +
                 "\n%s (Level %d) | HP: %d | Status: %s" +
                 "\nEquipped Weapon: %s" +
-                "\nDescription: %s", name, level, hp, status, equippedWeapon, description
+                "\nDescription: %s" +
+                "\nSTR: %s, INT: %s, DEX: %s",
+                name, level, hp, status, equippedWeapon, description, getStat(StatType.STR), getStat(StatType.INT), getStat(StatType.DEX)
         );
     }
 

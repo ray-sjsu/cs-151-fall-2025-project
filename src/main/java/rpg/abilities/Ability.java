@@ -61,13 +61,18 @@ public class Ability implements Usable {
     public int use(Characters user, Characters target) {
         int damage = 0;
 
-        if (isOnCooldown()) {
-            throw new AbilityOnCooldownException(name + " is on cooldown!");
-        } else {
-            int statValue = user.getStat(scalingStat);
-            damage = basePower + (statValue / 2);
-            target.takeDamage(damage);
-            startCooldown();
+        try {
+            if (isOnCooldown()) {
+                throw new AbilityOnCooldownException(name + " is on cooldown!");
+            } else {
+                int statValue = user.getStat(scalingStat);
+                damage = basePower + (statValue / 2);
+                target.takeDamage(damage);
+                startCooldown();
+            }
+        } catch (AbilityOnCooldownException e) {
+            System.out.println("Exception caught");
+            damage = -1;
         }
 
         return damage;

@@ -24,11 +24,16 @@ public class Inventory {
     }
 
     public void addItem(Item item) {
-        if (items.size() >= slotCapacity) {
-            throw new InventoryFullException("Inventory is full! Cannot add " + item.getName());
+        try {
+            if (items.size() >= slotCapacity) {
+                throw new InventoryFullException("Inventory is full! Cannot add " + item.getName());
+            }
+            items.add(item);
+            System.out.printf("Added %s to inventory.%n", item.getName());
+        } catch (InventoryFullException e) {
+            System.out.printf("Cannot add item %s to inventory.%n", item.getName());
         }
-        items.add(item);
-        System.out.printf("Added %s to inventory.%n", item.getName());
+
     }
 
     public void removeItem(Item item) {

@@ -2,27 +2,32 @@
 title Turn Based RPG (1 playable character + 1 npc enemy) - UML Class Diagram
 
 ' @Enums
-enum StatType {
-    STRENGTH
-    INTELLIGENCE
-    DEXTERITY
+rectangle CharactersEnums {
+    enum StatusType {
+        IDLE
+        READY
+        DEAD
+        MISSING
+    }
+    enum ActionType {
+        ATTACK
+        ABILITY
+        ITEM
+        WAIT
+        BEGIN_TURN
+    }
 }
-enum ActionType {
-    ATTACK
-    ABILITY
-    ITEM
-    WAIT
-}
-enum RarityType {
-    COMMON
-    RARE
-    LEGENDARY
-}
-enum StatusType {
-    IDLE
-    READY
-    DEAD
-    MISSING
+rectangle DescriptionEnums {
+    enum RarityType {
+        COMMON
+        RARE
+        LEGENDARY
+    }
+    enum StatType {
+        STR
+        INT
+        DEX
+    }
 }
 
 ' @Interfaces
@@ -40,117 +45,140 @@ class AbilityOnCooldownException extends RuntimeException
 
 ' @Characters
 abstract class Characters {
-    - characterId: int
-    - name: String
-    - description: String
-    - level: int
-    - maxHealth: int
-    - currentHealth: int
-    - maxActionPoints: int
-    - currentActionPoints: int
-    - inventory: Inventory
-    - abilities: List<Ability>
-    - stats: Map<StatType, Integer>
-    - status: StatusType
+    # characterId: int
+    # name: String
+    # description: String
+    # level: int
+    # hp : int
+    # inventory: Inventory
+    # equippedWeapon: Weapon
+    # abilities: List<Ability>
+    # stats: Map<StatType, Integer>
+    # status: StatusType
+    # instanceCount: int
 
     + attack(target: Characters): void
     + takeDamage(amount: int): void
-    + useAbility(ability: Ability, target: Characters): void throws AbilityOnCooldownException
-    + startTurn(): void
     + canAct(): boolean
-    + toString(): String
-
+    + getEquippedWeapon(): Weapon
+    + equipWeapon(weapon: Weapon): void
+    + getAbilities(): List<Ability>
+    + addAbility(ability: Ability): void
+    + removeAbility(ability: Ability): void
+    + getName(): String
+    + getLevel(): int
+    + getHp(): int
+    + getInventory(): Inventory
+    + getStatus(): StatusType
+    + setStatus(): void
     + getStat(type: StatType): int
-    + setStat(type: StatType, value: int): int
-    + isAlive(): boolean
-    + restoreActionPoints(): void
+    + setStat(type: StatType, value: int): void
+    + toString(): String
 }
 class PlayableCharacter extends Characters {
     +heal(amount: int): void
     +levelUp(): void
-    +equipWeapon(weapon: Weapon): void
     +loot(items: List<Item>): void
 }
 class Enemy extends Characters {
-    +fleeChance(): boolean
-    +respawn(): void
+    +fleeChance(percentChange: int): boolean
     +dropLoot(): List<Item>
-    ' Removed for now: +applyStatusEffect(target: Characters): void
 }
 
 ' @Inventory, Items, Weapons, and Abilities
 class Inventory {
     -slotCapacity: int
     -items: List<Item>
+    -instanceCount: int
 
-    +addItem(item: Item): void throws InventoryFullException
-    +removeItem(itemId: int): void
-    +hasSpaceFor(item: Item): boolean
-    +findById(itemId: int): Item
+    +addItem(item: Item): void
+    +removeItem(item: Item): void
+    +getItems(): List<Item>
     +totalWeight(): double
     +toString(): String
 }
 abstract class Item {
-    -itemId: int
-    -name: String
-    -description: String
-    -weight: double
-    -rarity: RarityType
-    -slotsTaken: int
+    #itemId: int
+    #name: String
+    #description: String
+    #weight: double
+    #rarity: RarityType
+    #instanceCount: int
 
+    +getItemId(): int
+    +getName(): String
+    +getDescription(): String
+    +getWeight(): double
     +toString(): String
 }
 class Weapon extends Item implements Usable {
     -minDamage: int
     -maxDamage: int
     -critChance: double
-    -durability: int
-    -lastUsedTurn: int
-    -actionPointCost: int
-    -cooldown: int
 
-    +calculateDamage(player: Characters, target: Characters): int
-    +rollCrit(player: Characters, target: Characters): boolean
-    +consumeDurability(): void
-    +rechargeCooldown(): void
+    +calculateDamageWithCriticalChance(user: Characters, target: Characters): int
 }
 class Ability implements Usable {
     -abilityId: int
     -name: String
-    -lastUsedTurn: int
-    -power: int
+    -description: String
     -scalingStat: StatType
-    -actionPointCost: int
-    -cooldown: int
+    -basePower: int
+    -currentCooldownDuration: int
+    -cooldownDuration: int
+    -instanceCount: int
 
-    +isReady(): boolean
-    +use(user: Characters, targets: List<Characters>, bf: BattlefieldManager): void
-    +spendActionPoints(user: Characters): int
-    +putOnCooldown(): void
-    +scalingValue(user: Characters): int
-    +resetCooldown(): void
+    +startCooldown(): void
+    +reduceCooldown(): void
+    +isOnCooldown(): boolean
+    +getName(): String
 }
 
 ' @BattleFieldManager and TurnAction
 class BattlefieldManager {
     -turnCount: int
     -turnOrder: Queue<TurnAction>
+    -player: PlayableCharacter
+    -enemy: Enemy
+    -instanceCount: int
 
     +initCombat(player: PlayableCharacter, enemy: Enemy): void
-    +currentActor(): Characters
-    +nextTurn(): TurnAction
+    +addTurnAction(action: TurnAction): void
+    +getTurnCount(): int
+    +incrementTurnCount(): void
+    +getTurnHistory(): List<TurnAction>
     +isBattleOver(): boolean
-    +currentTurn(): int
-    +winner(): String
+    +getWinner(): Characters
     +toString(): String
 }
 class TurnAction {
     -actor: Characters
-    -type: ActionType
+    -actionType: ActionType
+    -statusType: StatusType
     -payload: Object
+    -instanceCount: int
 
     +toString(): String
 }
+' @UI/UX classes
+class Main {
+    +main(args: String[]): void
+}
+class Menus {
+    +showLevelUpStats(player: PlayableCharacter): void
+    +printCharacterComparison(character1: Characters, character2: Characters): void
+    +useAbilityMenu(scanner: Scanner, player: PlayableCharacter, enemy: Enemy, bf: BattlefieldManager): String
+}
+class Scene {
+    +SCREEN_WIDTH: int
+    -SPRITE_SPACING: int
+
+    +centerText(text: String): String
+    +loadingScreen(milliseconds: long): void
+    +clearScreen(): void
+    +printBattleUI(player: PlayableCharacter, enemy: Enemy, actionText: String, bf: BattlefieldManager): void
+}
+
 
 ' @Relationships
 Characters "<color:red>1</color>" *-- "<color:red>1       </color>" Inventory
@@ -160,10 +188,18 @@ Inventory "<color:red>  1</color>" o-- "<color:red>          0..*</color>" Item
 
 BattlefieldManager "<color:red>1  </color>" o-- "<color:red>2 </color>" Characters
 BattlefieldManager ..> TurnAction
+Main ..> Menus
+Main ..> Scene
 
 
 note top of MaxInstancesLimitException
-Constructors enforce cap of 100 instances per class.
+Constructors enforce cap of 100 instances per class using instanceCount.
+In some implementations, the instanceCount is shared together by super and sub classes.
+end note
+
+note top of Main
+Driver class for the program.
+Has UI/UX helper classes like Menus and Scene.
 end note
 
 @enduml
