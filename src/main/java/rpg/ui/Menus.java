@@ -97,30 +97,32 @@ public class Menus {
         return null;
     }
     public static void endGameMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
+        String resultMessage = "Battle results.";
+
+        if (bf.getWinner().isEmpty()) {
+            resultMessage = "It's a draw!";
+        }
+        else if (bf.getWinner().getFirst() instanceof PlayableCharacter) {
+            resultMessage = "Player wins!";
+            System.out.printf("Enemy %s has dropped some loot.\n", enemy.getName());
+            List<Item> enemyLoot = enemy.dropLoot();
+            System.out.printf("Player %s has looted Enemy %s.\n", player.getName(), enemy.getName());
+            player.loot(enemyLoot);
+        } else if (bf.getWinner().getFirst() instanceof Enemy) {
+            resultMessage = "Enemy wins!";
+        }
+
+
         while (true) {
             // Check winner
-            String resultMessage = "Battle results.";
-            if (bf.getWinner().isEmpty()) {
-                resultMessage = "It's a draw!";
-                System.out.println("*".repeat(SCREEN_WIDTH));
-                System.out.println(centerText(resultMessage));
-                System.out.println("*".repeat(SCREEN_WIDTH));
-            }
-            else if (bf.getWinner().getFirst() instanceof PlayableCharacter) {
-                resultMessage = "Player wins!";
-                System.out.println("*".repeat(SCREEN_WIDTH));
-                System.out.println(centerText(resultMessage));
-                System.out.println("*".repeat(SCREEN_WIDTH));
+            System.out.println("*".repeat(SCREEN_WIDTH));
+            System.out.println(centerText(resultMessage));
+            System.out.println("*".repeat(SCREEN_WIDTH));
+
+            if (bf.getWinner().getFirst() instanceof PlayableCharacter) {
                 showLevelUpStats(player);
                 System.out.printf("Enemy %s has dropped some loot.\n", enemy.getName());
-                List<Item> enemyLoot = enemy.dropLoot();
                 System.out.printf("Player %s has looted Enemy %s.\n", player.getName(), enemy.getName());
-                player.loot(enemyLoot);
-            } else if (bf.getWinner().getFirst() instanceof Enemy) {
-                resultMessage = "Enemy wins!";
-                System.out.println("*".repeat(SCREEN_WIDTH));
-                System.out.println(centerText(resultMessage));
-                System.out.println("*".repeat(SCREEN_WIDTH));
             }
 
             // Menu
