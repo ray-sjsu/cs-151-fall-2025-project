@@ -28,21 +28,22 @@ public class Main {
         System.out.println(centerText("\n\nWelcome to the Battlefield!\n"));
 
         PlayableCharacter player = new PlayableCharacter(1, "Gordon", "Used to run a kitchen in hell.", 1, 50);
-        Weapon sword = new Weapon(1, "Knife", "Used for cooking or cutting.",
+        Weapon sword = new Weapon(1, "Knife\uD83D\uDD2A", "Used for cooking or cutting.",
                 5.0, RarityType.COMMON, 10, 15, 0.40);
         player.getInventory().addItem(sword);
+        player.getInventory().addItem(new Item(44, "Cube\uD83E\uDDCA", "4 cm tungsten cube with oxidation.", 2.7, RarityType.LEGENDARY));
         player.equipWeapon(sword);
         player.addAbility(new Ability(1, "Flambé\uD83D\uDD25", "INT-scaled attack that sets the enemy on fire.", StatType.INT, 20, 0, 2));
         player.addAbility(new Ability(2, "Casted Iron\uD83C\uDF73", "STR-scaled attack for hitting un-pleasant customers.", StatType.STR, 30, 0, 3));
-        player.addAbility(new Ability(999, "Instant kill", "Instantly kill the enemy.", StatType.STR, 300, 0, 9999));
+        player.addAbility(new Ability(999, "Instant kill\uD83D\uDC80", "Instantly kill the enemy.", StatType.STR, 300, 0, 9999));
         player.setStat(StatType.STR, 10);
         player.setStat(StatType.INT, 7);
 
         Enemy enemy = new Enemy(1, "Goblin", "Looks like a frog.", 1, 50);
-        Weapon stick = new Weapon(1, "Stick", "A long stick.",
+        Weapon stick = new Weapon(1, "Stick\uD83E\uDE7C", "A long stick.",
                 2.0, RarityType.RARE, 8, 12, 0.40);
         enemy.getInventory().addItem(stick);
-        enemy.getInventory().addItem(new Item(44, "Gold Coin", "A shiny coin.", 0.1, RarityType.COMMON));
+        enemy.getInventory().addItem(new Item(44, "Gold Coin\uD83E\uDE99", "A shiny coin.", 0.1, RarityType.COMMON));
         enemy.equipWeapon(stick);
 
         battlefield.initCombat(player, enemy);
