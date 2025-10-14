@@ -1,5 +1,6 @@
 package rpg.characters;
 
+import rpg.abilities.Ability;
 import rpg.core.StatType;
 import rpg.exceptions.InventoryFullException;
 import rpg.items.Item;
@@ -25,13 +26,19 @@ public class PlayableCharacter extends Characters {
         setStat(StatType.DEX, getStat(StatType.DEX) + 1);
     }
 
+    public void rest() {
+        for (Ability ability : abilities) {
+            ability.reduceCooldown();
+        }
+    }
+
     public void loot(List<Item> items) {
         for (Item item : items) {
             try {
                 inventory.addItem(item);
-                System.out.println("Added " + item.getName() + " to " + getName() + "'s inventory.");
+                // System.out.println("Added " + item.getName() + " to " + getName() + "'s inventory.");
             } catch (InventoryFullException e) {
-                System.out.println(e.getMessage());
+                // System.out.println(e.getMessage());
             }
         }
     }

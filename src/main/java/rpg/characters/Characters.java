@@ -58,7 +58,7 @@ public abstract class Characters {
         int damage;
 
         if (equippedWeapon != null) {
-            damage = equippedWeapon.calculateDamageWithCriticalChance(this, target);
+            damage = equippedWeapon.use(this, target);
         } else {
             damage = getStat(StatType.STR);
         }

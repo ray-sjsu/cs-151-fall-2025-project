@@ -13,7 +13,7 @@ The medium we chose is a turn-based role-playing game (RPG). There will be one p
 
 ## Design
 Refer to the full UML diagram for details. This project follows an objected-oriented design built around modular game components.
-Classes are separated into separate files and compartmentalized into different packages.
+Classes are separated into files and compartmentalized into different packages.
 - **Core**: The driver class `Main` setups the game, manages UI/UX (`Menus`, `Scene`), and manages game logic through `BattlefieldManager` which keeps track and coordinates turns.
 - **Characters**: An abstract class `Characters` defines the blueprint for `PlayableCharacter` and `Enemy` that extends this class with its common variables and methods.
 - **Actions**: `Ability` with `Usable` interface provide the player with a mechanism for skill use.
@@ -21,9 +21,10 @@ Classes are separated into separate files and compartmentalized into different p
 - **Item**: Many instances of `Item` can go into one `Inventory`. All collectable items are stored in Inventories and share a common blueprint.
 - **Weapon**: A `Weapon` is a generalization of an `Item` and inherits properties accordingly. `Weapon` is equipable by `Characters` for use in combat.
 - **Exceptions**: `MaxInstanceLimitException` is the most important exception to limit instances up to 100 per class. This limit may be shared between super and subclasses.
+- **Unit Testing**: Use of JUnit to test relevant classes and to check if exceptions are handled properly.
 
 The design considerations are as follows:
-- Emphasis on encapsulation and inheritance for reusability. "DRY" principle.
+- Emphasis on encapsulation and inheritance for reusability. "DRY" principle and keep things simple.
 - Separation of UI/UX and game logic.
 - Scalability for adding new characters, abilities, or items.
 
@@ -73,7 +74,8 @@ Game ends once either the player or enemy fall.
 ### Raymund Mercader
 - Class: `BattlefieldManager`, `TurnAction`
 - UI/UX Class: `Main`, `Menus`, `Scene`
-- UML Diagram and `README.md`
+- UML Diagram, `README.md`
+- Unit Testing
 
 Note: Refer to UML diagram. For simplicity, each contributed entry is only listed once. 
 
