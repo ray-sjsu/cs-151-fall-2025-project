@@ -152,11 +152,6 @@ public class Menus {
                     scanner.close();
                     return;
                 }
-                default -> {
-                    System.out.println("Invalid choice. Try again.");
-                    System.out.println("\nPress ENTER to continue...");
-                    scanner.nextLine();
-                }
             }
         }
     }
@@ -225,9 +220,7 @@ public class Menus {
                 }
 
                 default -> {
-                    System.out.println("Invalid choice. Try again.");
-                    System.out.println("\nPress ENTER to continue...");
-                    scanner.nextLine();
+                    return;
                 }
             }
         }

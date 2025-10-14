@@ -36,9 +36,9 @@ public class PlayableCharacter extends Characters {
         for (Item item : items) {
             try {
                 inventory.addItem(item);
-                System.out.println("Added " + item.getName() + " to " + getName() + "'s inventory.");
+                // System.out.println("Added " + item.getName() + " to " + getName() + "'s inventory.");
             } catch (InventoryFullException e) {
-                System.out.println(e.getMessage());
+                // System.out.println(e.getMessage());
             }
         }
     }

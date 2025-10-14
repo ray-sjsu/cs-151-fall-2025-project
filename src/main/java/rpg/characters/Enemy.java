@@ -29,7 +29,7 @@ public class Enemy extends Characters {
     public List<Item> dropLoot() {
         List<Item> loot = new ArrayList<>(inventory.getItems());
 
-        System.out.printf("%s drops loot!%n", name);
+        // System.out.printf("%s drops loot!%n", name);
         return loot;
     }
 
