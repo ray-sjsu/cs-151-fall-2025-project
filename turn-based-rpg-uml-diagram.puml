@@ -34,7 +34,6 @@ rectangle DescriptionEnums {
 interface Usable {
     +use(user: Characters, target: Characters): void
     +isUsable(user: Characters, target: Characters): boolean
-    +cooldownRemaining(): int
     +toString(): String
 }
 
@@ -78,6 +77,7 @@ abstract class Characters {
 class PlayableCharacter extends Characters {
     +heal(amount: int): void
     +levelUp(): void
+    +rest(): void
     +loot(items: List<Item>): void
 }
 class Enemy extends Characters {
@@ -115,8 +115,6 @@ class Weapon extends Item implements Usable {
     -minDamage: int
     -maxDamage: int
     -critChance: double
-
-    +calculateDamageWithCriticalChance(user: Characters, target: Characters): int
 }
 class Ability implements Usable {
     -abilityId: int
@@ -148,7 +146,7 @@ class BattlefieldManager {
     +incrementTurnCount(): void
     +getTurnHistory(): List<TurnAction>
     +isBattleOver(): boolean
-    +getWinner(): Characters
+    +getWinner(): List<Characters>
     +toString(): String
 }
 class TurnAction {
@@ -158,6 +156,9 @@ class TurnAction {
     -payload: Object
     -instanceCount: int
 
+    +actor(): Characters
+    +actionType(): ActionType
+    +payload(): Object
     +toString(): String
 }
 ' @UI/UX classes
@@ -167,7 +168,8 @@ class Main {
 class Menus {
     +showLevelUpStats(player: PlayableCharacter): void
     +printCharacterComparison(character1: Characters, character2: Characters): void
-    +useAbilityMenu(scanner: Scanner, player: PlayableCharacter, enemy: Enemy, bf: BattlefieldManager): String
+    +useAbilityMenu(scanner: Scanner, player: PlayableCharacter, enemy: Enemy, bf: BattlefieldManager): Ability
+    +endGameMenu(scanner: Scanner, player: PlayableCharacter, enemy: Enemy, bf: BattlefieldManager): void
 }
 class Scene {
     +SCREEN_WIDTH: int
@@ -182,7 +184,7 @@ class Scene {
 
 ' @Relationships
 Characters "<color:red>1</color>" *-- "<color:red>1       </color>" Inventory
-Characters "<color:red>1      </color>" o-- "<color:red>*</color>" Ability
+Characters "<color:red>1      </color>" o-- "<color:red>0..*</color>" Ability
 
 Inventory "<color:red>  1</color>" o-- "<color:red>          0..*</color>" Item
 
@@ -190,16 +192,18 @@ BattlefieldManager "<color:red>1  </color>" o-- "<color:red>2 </color>" Characte
 BattlefieldManager ..> TurnAction
 Main ..> Menus
 Main ..> Scene
+Menus ..> Scene
 
 
 note top of MaxInstancesLimitException
-Constructors enforce cap of 100 instances per class using instanceCount.
-In some implementations, the instanceCount is shared together by super and sub classes.
+Each relevant classes have constructors that:
+- enforce the cap of 100 instances per class
+- keep track of created instances using instanceCount
 end note
 
-note top of Main
+note left of Main
 Driver class for the program.
-Has UI/UX helper classes like Menus and Scene.
+Uses UI/UX helper classes like Menus and Scene.
 end note
 
 @enduml
