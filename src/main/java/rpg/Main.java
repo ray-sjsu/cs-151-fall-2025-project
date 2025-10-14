@@ -89,9 +89,11 @@ public class Main {
                     battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
                 }
                 case "3" -> {
-                    String result = useAbilityMenu(scanner, player, enemy, battlefield);
-                    if (result != null) {
-                        lastActionText = result;
+                    Ability chosen = useAbilityMenu(scanner, player, enemy, battlefield);
+                    if (chosen != null) {
+                        int damage = chosen.use(player, enemy);
+                        battlefield.addTurnAction(new TurnAction(player, ActionType.ABILITY, StatusType.READY, chosen));
+                        lastActionText =  String.format("%s uses %s on %s for %d damage!\n", player.getName(), chosen.getName(), enemy.getName(), damage);
                     } else {
                         continue;
                     }

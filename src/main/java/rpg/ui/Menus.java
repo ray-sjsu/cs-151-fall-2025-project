@@ -6,17 +6,13 @@ import rpg.battlefield.TurnAction;
 import rpg.characters.Characters;
 import rpg.characters.Enemy;
 import rpg.characters.PlayableCharacter;
-import rpg.core.ActionType;
 import rpg.core.StatType;
-import rpg.core.StatusType;
 import rpg.items.Item;
 
 import java.util.List;
 import java.util.Scanner;
 
-import static rpg.ui.Scene.clearScreen;
-import static rpg.ui.Scene.SCREEN_WIDTH;
-import static rpg.ui.Scene.centerText;
+import static rpg.ui.Scene.*;
 
 public class Menus {
     public static void showLevelUpStats(PlayableCharacter player) {
@@ -49,7 +45,7 @@ public class Menus {
         System.out.print(character1);
         System.out.println(character2);
     }
-    public static String useAbilityMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
+    public static Ability useAbilityMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
         List<Ability> abilities = player.getAbilities();
 
         while (true) {
@@ -59,11 +55,11 @@ public class Menus {
                 String cooldownText = a.isOnCooldown()
                         ? String.format("(Cooldown: %d turns left)", a.cooldownRemaining())
                         : "(Ready)";
-                System.out.printf("%d) %s %s%n", i + 1, a, cooldownText);
+                System.out.printf("%d) %s %s%n\n", i + 1, a, cooldownText);
             }
 
             System.out.println("0) Cancel (Or press ENTER)");
-            System.out.print("> ");
+            System.out.print("\n\n> ");
             String input = scanner.nextLine().trim();
 
             if (input.equals("0") || input.isEmpty()) {
@@ -83,15 +79,7 @@ public class Menus {
                 continue;
             }
 
-            Ability chosen = abilities.get(abilityIndex);
-
-            int damage = chosen.use(player, enemy);
-            if (damage == -1 ) {
-                System.out.println("Ability on cooldown. Try again.");
-                continue;
-            }
-            bf.addTurnAction(new TurnAction(player, ActionType.ABILITY, StatusType.READY, chosen));
-            return String.format("%s uses %s on %s for %d damage!\n", player.getName(), chosen.getName(), enemy.getName(), damage);
+            return abilities.get(abilityIndex);
         }
 
         return null;
