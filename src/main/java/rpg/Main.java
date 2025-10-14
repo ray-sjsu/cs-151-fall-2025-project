@@ -34,6 +34,7 @@ public class Main {
         player.equipWeapon(sword);
         player.addAbility(new Ability(1, "Flambé\uD83D\uDD25", "INT-scaled attack that sets the enemy on fire.", StatType.INT, 20, 0, 2));
         player.addAbility(new Ability(2, "Casted Iron\uD83C\uDF73", "STR-scaled attack for hitting un-pleasant customers.", StatType.STR, 30, 0, 3));
+        player.addAbility(new Ability(999, "Instant kill", "Instantly kill the enemy.", StatType.STR, 300, 0, 9999));
         player.setStat(StatType.STR, 10);
         player.setStat(StatType.INT, 7);
 
@@ -49,7 +50,7 @@ public class Main {
         String lastActionText = centerText("The battle begins!");
         int healAmount = 5;
 
-        // Start of battle
+        // Start of battle (every loop iteration is one turn, both Characters can take action)
         while (true) {
             clearScreen();
             printBattleUI(player, enemy, lastActionText, battlefield);
@@ -72,102 +73,102 @@ public class Main {
             System.out.print("> ");
             String choice = scanner.nextLine();
 
-            // Continue battle
-            if (!battlefield.isBattleOver()) {
-                // Start of player turn
-                switch (choice) {
-                    case "1" -> {
-                        int dmg = player.attack(enemy);
-                        lastActionText = String.format("Player %s uses Weapon %s on Enemy %s for %d damage!\n", player.getName(), player.getEquippedWeapon().getName(), enemy.getName(), dmg);
-                        battlefield.addTurnAction(new TurnAction(player, ActionType.ATTACK, StatusType.READY, lastActionText));
+            // Start of player actions
+            switch (choice) {
+                case "1" -> {
+                    int dmg = player.attack(enemy);
+                    lastActionText = String.format("Player %s uses Weapon %s on Enemy %s for %d damage!\n", player.getName(), player.getEquippedWeapon().getName(), enemy.getName(), dmg);
+                    battlefield.addTurnAction(new TurnAction(player, ActionType.ATTACK, StatusType.READY, lastActionText));
+                    if (enemy.getHp() <= 0) {
+                        enemy.setStatus(StatusType.DEAD);
                     }
-                    case "2" -> {
-                        player.heal(healAmount);
-                        lastActionText = String.format("Player %s heals for %d HP!\n", player.getName(), healAmount);
-                        battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
+                }
+                case "2" -> {
+                    player.heal(healAmount);
+                    lastActionText = String.format("Player %s heals for %d HP!\n", player.getName(), healAmount);
+                    battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
+                }
+                case "3" -> {
+                    String result = useAbilityMenu(scanner, player, enemy, battlefield);
+                    if (result != null) {
+                        lastActionText = result;
+                    } else {
+                        continue;
                     }
-                    case "3" -> {
-                        String result = useAbilityMenu(scanner, player, enemy, battlefield);
-                        if (result != null) {
-                            lastActionText = result;
-                        } else {
-                            continue;
+                }
+                case "4" -> {
+                    player.rest();
+                    lastActionText = String.format("Player %s rested to reduce all used abilities cooldowns by an additional 1\n", player.getName());
+                    battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
+                    if (enemy.getHp() <= 0) {
+                        enemy.setStatus(StatusType.DEAD);
+                    }
+                }
+                case "5" -> {
+                    lastActionText = String.format("Player %s skipped their turn!\n", player.getName());
+                    battlefield.addTurnAction(new TurnAction(player, ActionType.WAIT, StatusType.IDLE, lastActionText));
+                }
+                case "6" -> {
+                    manageInventoryMenu(scanner, player);
+                    continue;
+                }
+                case "7" -> {
+                    System.out.printf("\nBattle History - Total Turns: %d", battlefield.getTurnCount());
+                    List<TurnAction> history = battlefield.getTurnHistory();
+                    if (history.isEmpty()) {
+                        System.out.println("No actions have been taken yet.");
+                    } else {
+                        System.out.println();
+                        for (int i = 0; i < history.size(); i++) {
+                            System.out.printf("%2d. %s%n", i + 1, history.get(i));
                         }
                     }
-                    case "4" -> {
-                        player.rest();
-                        lastActionText = String.format("Player %s rested to reduce all used abilities cooldowns by an additional 1\n", player.getName());
-                        battlefield.addTurnAction(new TurnAction(player, ActionType.ITEM, StatusType.READY, lastActionText));
-                    }
-                    case "5" -> {
-                        lastActionText = String.format("Player %s skipped their turn!\n", player.getName());
-                        battlefield.addTurnAction(new TurnAction(player, ActionType.WAIT, StatusType.IDLE, lastActionText));
-                    }
-                    case "6" -> {
-                        manageInventoryMenu(scanner, player);
-                        continue;
-                    }
-                    case "7" -> {
-                        System.out.printf("\nBattle History - Total Turns: %d", battlefield.getTurnCount());
-                        List<TurnAction> history = battlefield.getTurnHistory();
-                        if (history.isEmpty()) {
-                            System.out.println("No actions have been taken yet.");
-                        } else {
-                            System.out.println();
-                            for (int i = 0; i < history.size(); i++) {
-                                System.out.printf("%2d. %s%n", i + 1, history.get(i));
-                            }
-                        }
-                        System.out.println("\nPress ENTER to return...");
-                        scanner.nextLine();
-                        continue;
-                    }
-                    case "8" -> {
-                        printCharacterComparison(player, enemy);
-                        System.out.println("\nPress ENTER to return...");
-                        scanner.nextLine();
-                        continue;
-                    }
-                    case "9" -> {
-                        System.out.println("Thanks for playing!");
-                        scanner.close();
-                        return;
-                    }
-                    default -> {
-                        System.out.println("Invalid choice. Try again.");
-                        System.out.println("\nPress ENTER to continue...");
-                        scanner.nextLine();
-                    }
+                    System.out.println("\nPress ENTER to return...");
+                    scanner.nextLine();
+                    continue;
                 }
-
-                if (battlefield.isBattleOver()) {
-                    break;
+                case "8" -> {
+                    printCharacterComparison(player, enemy);
+                    System.out.println("\nPress ENTER to return...");
+                    scanner.nextLine();
+                    continue;
                 }
-
-                // Start of enemy turn
-                if (enemy.fleeChance(10)) {
-                    lastActionText = enemy.getName() + " ran away!";
-                    battlefield.addTurnAction(new TurnAction(enemy, ActionType.WAIT, StatusType.MISSING, lastActionText));
-                    break;
-                } else {
-                    player.setStatus(StatusType.IDLE);
-                    int dmg = enemy.attack(player);
-                    lastActionText += String.format("Enemy %s uses Weapon %s on Player %s for %d damage!", enemy.getName(), enemy.getEquippedWeapon().getName(), player.getName(), dmg);
-                    battlefield.addTurnAction(new TurnAction(enemy, ActionType.ATTACK, StatusType.READY, lastActionText));
-                    enemy.setStatus(StatusType.IDLE);
+                case "9" -> {
+                    System.out.println("Thanks for playing!");
+                    scanner.close();
+                    return;
                 }
-
-                // Reset player cooldowns
-                for (Ability a : player.getAbilities()) {
-                    a.reduceCooldown();
+                default -> {
+                    System.out.println("Invalid choice. Try again.");
+                    System.out.println("\nPress ENTER to continue...");
+                    scanner.nextLine();
                 }
-
-                battlefield.incrementTurnCount();
-            } else {
-                break;
             }
-        }
 
+
+            // Start of enemy actions
+            if (enemy.fleeChance(10)) {
+                lastActionText = enemy.getName() + " ran away!";
+                battlefield.addTurnAction(new TurnAction(enemy, ActionType.WAIT, StatusType.MISSING, lastActionText));
+                enemy.setStatus(StatusType.MISSING);
+            } else {
+                int dmg = enemy.attack(player);
+                lastActionText += String.format("Enemy %s uses Weapon %s on Player %s for %d damage!", enemy.getName(), enemy.getEquippedWeapon().getName(), player.getName(), dmg);
+                battlefield.addTurnAction(new TurnAction(enemy, ActionType.ATTACK, StatusType.READY, lastActionText));
+                if (player.getHp() > 0) {
+                    player.setStatus(StatusType.IDLE);
+                } else {
+                    player.setStatus(StatusType.DEAD);
+                }
+            }
+
+            // Reset player cooldowns
+            for (Ability a : player.getAbilities()) {
+                a.reduceCooldown();
+            }
+
+            battlefield.incrementTurnCount();
+        }
         // End of battle
         endGameMenu(scanner, player, enemy, battlefield);
     }

@@ -50,24 +50,27 @@ public class BattlefieldManager {
         return getWinner() != null;
     }
 
-    public Characters getWinner() {
+    public List<Characters> getWinner() {
         if (player == null || enemy == null) return null;
+        List<Characters> winner = new ArrayList<>();
 
         StatusType playerStatus = player.getStatus();
         StatusType enemyStatus = enemy.getStatus();
 
         boolean playerLost = (playerStatus == StatusType.DEAD || playerStatus == StatusType.MISSING);
-        boolean enemyLost  = (enemyStatus == StatusType.DEAD || enemyStatus == StatusType.MISSING);
+        boolean enemyLost = (enemyStatus == StatusType.DEAD || enemyStatus == StatusType.MISSING);
 
         if (playerLost && enemyLost) {
-            System.out.println("Both lost?");
-            return null;
+            // System.out.println("Both lost?");
+            return winner;
         } else if (playerLost) {
-            System.out.println("Enemy wins!");
-            return enemy;
+            // System.out.println("Enemy wins!");
+            winner.add(enemy);
+            return winner;
         } else if (enemyLost) {
-            System.out.println("Player wins!");
-            return player;
+            // System.out.println("Player wins!");
+            winner.add(player);
+            return winner;
         }
         return null;
     }

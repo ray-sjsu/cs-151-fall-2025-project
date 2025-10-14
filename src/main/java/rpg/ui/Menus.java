@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import static rpg.ui.Scene.clearScreen;
+import static rpg.ui.Scene.SCREEN_WIDTH;
+import static rpg.ui.Scene.centerText;
 
 public class Menus {
     public static void showLevelUpStats(PlayableCharacter player) {
@@ -25,7 +27,6 @@ public class Menus {
 
         player.levelUp();
 
-        clearScreen();
         System.out.printf("%s LEVEL UP! %n", player.getName());
         System.out.printf("Level: %d → %d%n", oldLevel, player.getLevel());
 
@@ -98,12 +99,28 @@ public class Menus {
     public static void endGameMenu(Scanner scanner, PlayableCharacter player, Enemy enemy, BattlefieldManager bf) {
         while (true) {
             // Check winner
-            if (bf.getWinner() instanceof PlayableCharacter) {
+            String resultMessage = "Battle results.";
+            if (bf.getWinner().isEmpty()) {
+                resultMessage = "It's a draw!";
+                System.out.println("*".repeat(SCREEN_WIDTH));
+                System.out.println(centerText(resultMessage));
+                System.out.println("*".repeat(SCREEN_WIDTH));
+            }
+            else if (bf.getWinner().getFirst() instanceof PlayableCharacter) {
+                resultMessage = "Player wins!";
+                System.out.println("*".repeat(SCREEN_WIDTH));
+                System.out.println(centerText(resultMessage));
+                System.out.println("*".repeat(SCREEN_WIDTH));
                 showLevelUpStats(player);
                 System.out.printf("Enemy %s has dropped some loot.\n", enemy.getName());
                 List<Item> enemyLoot = enemy.dropLoot();
                 System.out.printf("Player %s has looted Enemy %s.\n", player.getName(), enemy.getName());
                 player.loot(enemyLoot);
+            } else if (bf.getWinner().getFirst() instanceof Enemy) {
+                resultMessage = "Enemy wins!";
+                System.out.println("*".repeat(SCREEN_WIDTH));
+                System.out.println(centerText(resultMessage));
+                System.out.println("*".repeat(SCREEN_WIDTH));
             }
 
             // Menu
