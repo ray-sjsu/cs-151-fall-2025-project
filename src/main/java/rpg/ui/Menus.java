@@ -163,7 +163,8 @@ public class Menus {
 
             System.out.println("\nChoose an action:");
             System.out.println("1. Remove Item");
-            System.out.println("2. Exit Inventory");
+            System.out.println("2. Use Item");
+            System.out.println("3. Exit Inventory");
             System.out.print("\n> ");
             String choice = scanner.nextLine();
 
@@ -215,6 +216,52 @@ public class Menus {
                 }
 
                 case "2" -> {
+                    List<Item> availableItems = player.getInventory().getItems();
+                    Item equippedWeapon = player.getEquippedWeapon();
+
+                    if (availableItems.isEmpty()) {
+                        System.out.println("Inventory is empty. Nothing to use.");
+                        System.out.println("\nPress ENTER to continue...");
+                        scanner.nextLine();
+                        break;
+                    }
+
+                    System.out.println("\nSelect an item to use:");
+                    for (int i = 0; i < availableItems.size(); i++) {
+                        Item item = availableItems.get(i);
+                        if (item.equals(equippedWeapon)) {
+                            System.out.printf("%d. %s (Equipped)%n", i + 1, item.getName());
+                        } else {
+                            System.out.printf("%d. %s%n", i + 1, item.getName());
+                        }
+                    }
+
+                    System.out.print("\n> ");
+                    String input = scanner.nextLine();
+
+                    try {
+                        int index = Integer.parseInt(input) - 1;
+                        if (index >= 0 && index < availableItems.size()) {
+                            Item selectedItem = availableItems.get(index);
+
+                            if (selectedItem.equals(equippedWeapon)) {
+                                System.out.println("There is no use action for your equipped weapon!");
+                            } else {
+                                selectedItem.use(player, player);
+                                System.out.println("Used: " + selectedItem.getName());
+                            }
+                        } else {
+                            System.out.println("Invalid item number.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid number.");
+                    }
+
+                    System.out.println("\nPress ENTER to continue...");
+                    scanner.nextLine();
+                }
+
+                case "3" -> {
                     System.out.println("Exiting inventory...");
                     return;
                 }
